@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tiancai.mapper.BookAndListingMapper">
+
+    <!-- 1. 为 findAll() 方法提供SQL语句 -->
+    <!-- id="findAll" 必须和接口方法名完全一致 -->
+    <!-- resultType="com.itheima.pojo.User" 指定了每条记录要封装成的对象类型 -->
+    <select id="findAll" resultType="com.tiancai.pojo.User">
+        SELECT * FROM user_table
+    </select>
+
+    <!-- 2. 为 findById(Integer id) 方法提供SQL语句 -->
+    <!-- id="findById" 必须和接口方法名完全一致 -->
+    <!-- #{id} 表示引用传入的参数id -->
+    <select id="findById" resultType="com.tiancai.pojo.User">
+        SELECT * FROM user_table WHERE id = #{id}
+    </select>
+
+    <!-- 如果还有 insert, update, delete 等方法，就继续添加 <insert>, <update>, <delete> 标签 -->
+
+</mapper>
