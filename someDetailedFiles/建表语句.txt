@@ -1,0 +1,173 @@
+
+这些语句包含了主键、外键、索引、非空约束、默认值以及详细的注释，你可以直接在MySQL客户端（如Navicat, DataGrip, or the command line）中执行来创建你的数据库结构。
+
+注意事项
+
+执行顺序：我已经按照正确的依赖顺序排列了这些CREATE TABLE语句。请按此顺序执行，否则会因为外键约束而报错。
+
+表名 orders：我将实体“订单(Order)”对应的表命名为 orders，因为 ORDER 是SQL中的一个保留关键字（用于排序），使用它作为表名会引起问题。这是一个非常重要的编程规范。
+
+字符集：我统一使用了 utf8mb4 字符集，这是MySQL中推荐的，可以完美支持包括Emoji在内的所有Unicode字符。
+
+存储引擎：使用了 InnoDB，因为它支持事务和外键约束，这对于你的项目是必需的。
+
+校园二手书交易平台 - SQL建表语句
+code
+SQL
+download
+content_copy
+expand_less
+-- -----------------------------------------------------
+-- 数据库: `book_trading_platform` (你可以换成自己的数据库名)
+-- -----------------------------------------------------
+-- CREATE DATABASE IF NOT EXISTS `book_trading_platform` DEFAULT CHARACTER SET utf8mb4;
+-- USE `book_trading_platform`;
+
+-- -----------------------------------------------------
+-- 为了方便重复执行，先按逆序删除已存在的表
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `comment`;
+DROP TABLE IF EXISTS `orders`;
+DROP TABLE IF EXISTS `listing`;
+DROP TABLE IF EXISTS `book_category`;
+DROP TABLE IF EXISTS `book`;
+DROP TABLE IF EXISTS `category`;
+DROP TABLE IF EXISTS `user`;
+
+
+-- -----------------------------------------------------
+-- 表 1: 用户表 (User)
+-- -----------------------------------------------------
+CREATE TABLE `user` (
+  `user_id` INT NOT NULL AUTO_INCREMENT COMMENT '用户ID, 主键',
+  `student_id` VARCHAR(20) NOT NULL COMMENT '学号, 唯一',
+  `nickname` VARCHAR(50) NOT NULL COMMENT '昵称',
+  `password` VARCHAR(255) NOT NULL COMMENT '密码 (请务必存储加密后的哈希值)',
+  `register_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '注册时间',
+  `contact_info` VARCHAR(100) NULL COMMENT '联系方式 (如手机号或邮箱)',
+  `credit_score` INT NOT NULL DEFAULT 100 COMMENT '信誉积分',
+  PRIMARY KEY (`user_id`),
+  UNIQUE INDEX `uk_student_id` (`student_id` ASC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+
+
+-- -----------------------------------------------------
+-- 表 2: 书籍分类表 (Category)
+-- -----------------------------------------------------
+CREATE TABLE `category` (
+  `category_id` INT NOT NULL AUTO_INCREMENT COMMENT '分类ID, 主键',
+  `category_name` VARCHAR(50) NOT NULL COMMENT '分类名称',
+  PRIMARY KEY (`category_id`),
+  UNIQUE INDEX `uk_category_name` (`category_name` ASC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='书籍分类表';
+
+
+-- -----------------------------------------------------
+-- 表 3: 书籍信息表 (Book)
+-- -----------------------------------------------------
+CREATE TABLE `book` (
+  `book_id` INT NOT NULL AUTO_INCREMENT COMMENT '书籍ID, 主键',
+  `isbn` VARCHAR(20) NOT NULL COMMENT 'ISBN, 国际标准书号, 唯一',
+  `title` VARCHAR(255) NOT NULL COMMENT '书名',
+  `author` VARCHAR(100) NOT NULL COMMENT '作者',
+  `publisher` VARCHAR(100) NULL COMMENT '出版社',
+  `publication_year` VARCHAR(10) NULL COMMENT '出版年份',
+  `cover_image_url` VARCHAR(512) NULL COMMENT '封面图片URL',
+  PRIMARY KEY (`book_id`),
+  UNIQUE INDEX `uk_isbn` (`isbn` ASC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='书籍基本信息表';
+
+
+-- -----------------------------------------------------
+-- 表 4: 书籍与分类关联表 (Book_Category) - 多对多关系
+-- -----------------------------------------------------
+CREATE TABLE `book_category` (
+  `book_id` INT NOT NULL COMMENT '书籍ID, 外键',
+  `category_id` INT NOT NULL COMMENT '分类ID, 外键',
+  PRIMARY KEY (`book_id`, `category_id`),
+  INDEX `fk_book_category_category_idx` (`category_id` ASC),
+  CONSTRAINT `fk_book_category_book`
+    FOREIGN KEY (`book_id`)
+    REFERENCES `book` (`book_id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_book_category_category`
+    FOREIGN KEY (`category_id`)
+    REFERENCES `category` (`category_id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='书籍与分类的关联表';
+
+
+-- -----------------------------------------------------
+-- 表 5: 发布信息表 (Listing)
+-- -----------------------------------------------------
+CREATE TABLE `listing` (
+  `listing_id` INT NOT NULL AUTO_INCREMENT COMMENT '发布ID, 主键',
+  `seller_id` INT NOT NULL COMMENT '发布者ID, 外键关联User',
+  `book_id` INT NOT NULL COMMENT '书籍ID, 外键关联Book',
+  `price` DECIMAL(10,2) NOT NULL COMMENT '价格',
+  `condition_desc` VARCHAR(20) NOT NULL COMMENT '新旧程度 (如: 全新, 九成新, 轻微笔记)',
+  `listing_type` ENUM('出售', '赠送') NOT NULL COMMENT '发布类型: 出售/赠送',
+  `status` ENUM('在售', '已预定', '已售出', '已下架') NOT NULL DEFAULT '在售' COMMENT '状态: 在售/已预定/已售出/已下架',
+  `post_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '发布时间',
+  `description` TEXT NULL COMMENT '详细描述',
+  PRIMARY KEY (`listing_id`),
+  INDEX `fk_listing_user_idx` (`seller_id` ASC),
+  INDEX `fk_listing_book_idx` (`book_id` ASC),
+  CONSTRAINT `fk_listing_user`
+    FOREIGN KEY (`seller_id`)
+    REFERENCES `user` (`user_id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_listing_book`
+    FOREIGN KEY (`book_id`)
+    REFERENCES `book` (`book_id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='书籍发布信息表';
+
+
+-- -----------------------------------------------------
+-- 表 6: 订单表 (orders)
+-- -----------------------------------------------------
+CREATE TABLE `orders` (
+  `order_id` INT NOT NULL AUTO_INCREMENT COMMENT '订单ID, 主键',
+  `listing_id` INT NOT NULL COMMENT '发布ID, 外键关联Listing',
+  `buyer_id` INT NOT NULL COMMENT '购买者ID, 外键关联User',
+  `order_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '下单时间',
+  `order_status` ENUM('待确认', '已完成', '已取消') NOT NULL DEFAULT '待确认' COMMENT '订单状态: 待确认/已完成/已取消',
+  `transaction_price` DECIMAL(10,2) NOT NULL COMMENT '交易价格 (下单时的价格)',
+  PRIMARY KEY (`order_id`),
+  INDEX `fk_order_listing_idx` (`listing_id` ASC),
+  INDEX `fk_order_user_idx` (`buyer_id` ASC),
+  CONSTRAINT `fk_order_listing`
+    FOREIGN KEY (`listing_id`)
+    REFERENCES `listing` (`listing_id`)
+    ON DELETE RESTRICT ON UPDATE CASCADE, -- 订单关联的发布信息不应轻易删除
+  CONSTRAINT `fk_order_user`
+    FOREIGN KEY (`buyer_id`)
+    REFERENCES `user` (`user_id`)
+    ON DELETE RESTRICT ON UPDATE CASCADE -- 订单关联的用户不应轻易删除
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='交易订单表';
+
+
+-- -----------------------------------------------------
+-- 表 7: 评论/留言表 (Comment)
+-- -----------------------------------------------------
+CREATE TABLE `comment` (
+  `comment_id` INT NOT NULL AUTO_INCREMENT COMMENT '评论ID, 主键',
+  `listing_id` INT NOT NULL COMMENT '发布ID, 外键关联Listing',
+  `user_id` INT NOT NULL COMMENT '评论者ID, 外键关联User',
+  `content` TEXT NOT NULL COMMENT '评论内容',
+  `comment_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '评论时间',
+  PRIMARY KEY (`comment_id`),
+  INDEX `fk_comment_listing_idx` (`listing_id` ASC),
+  INDEX `fk_comment_user_idx` (`user_id` ASC),
+  CONSTRAINT `fk_comment_listing`
+    FOREIGN KEY (`listing_id`)
+    REFERENCES `listing` (`listing_id`)
+    ON DELETE CASCADE ON UPDATE CASCADE, -- 如果发布信息被删除, 评论也一并删除
+  CONSTRAINT `fk_comment_user`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `user` (`user_id`)
+    ON DELETE CASCADE ON UPDATE CASCADE -- 如果用户注销, 其评论也一并删除
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评论留言表';
+
+你现在可以基于这个数据库结构开始编写你的MyBatis Mapper XML文件和Java代码了。这个设计非常扎实，祝你大作业顺利！

@@ -20,5 +20,75 @@
     </select>
 
     <!-- 如果还有 insert, update, delete 等方法，就继续添加 <insert>, <update>, <delete> 标签 -->
+    <!-- 定义可重用的SQL片段，避免代码重复 -->
+    <sql id="filterConditions">
+        <!--
+            <where> 标签会自动处理开头的 'AND' 或 'OR'
+            test="..." 用于判断条件是否成立
+        -->
+        <where>
+            <!-- 关键词搜索：匹配书名、作者、ISBN -->
+            <if test="keyword != null and keyword != ''">
+                (b.title LIKE CONCAT('%', #{keyword}, '%') OR
+                b.author LIKE CONCAT('%', #{keyword}, '%') OR
+                b.isbn LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <!-- 分类筛选 -->
+            <if test="categoryId != null">
+                AND EXISTS (
+                SELECT 1 FROM book_category bc
+                WHERE bc.book_id = b.book_id AND bc.category_id = #{categoryId}
+                )
+            </if>
+            <!-- 只查询在售的商品 -->
+            AND l.status = '在售'
+        </where>
+    </sql>
+
+    <!-- 实现 countListings 方法 -->
+    <select id="countListings" resultType="java.lang.Long">
+        SELECT count(l.listing_id)
+        FROM listing l
+        JOIN book b ON l.book_id = b.book_id
+        <!-- 引用SQL片段 -->
+        <include refid="filterConditions"/>
+    </select>
+
+    <!-- 实现 findPaginatedListings 方法 -->
+    <select id="findPaginatedListings" resultType="com.tiancai.pojo.Listing">
+        SELECT
+        l.listing_id AS listingId,
+        b.title,
+        b.author,
+        l.price,
+        l.listing_type AS listingType,
+        l.status,
+        b.cover_image_url AS coverImageUrl,
+        u.nickname AS sellerNickname
+        FROM
+        listing l
+        JOIN book b ON l.book_id = b.book_id
+        JOIN `user` u ON l.seller_id = u.user_id
+        <!-- 引用SQL片段 -->
+        <include refid="filterConditions"/>
+
+        <!-- 动态排序 -->
+        <choose>
+            <when test="sortBy == 'price_asc'">
+                ORDER BY l.price ASC
+            </when>
+            <when test="sortBy == 'price_desc'">
+                ORDER BY l.price DESC
+            </when>
+            <otherwise>
+                <!-- 默认按发布时间降序 -->
+                ORDER BY l.post_time DESC
+            </otherwise>
+        </choose>
+
+        <!-- 分页 -->
+        LIMIT #{pageSize} OFFSET ${(page - 1) * pageSize}
+    </select>
+
 
 </mapper>

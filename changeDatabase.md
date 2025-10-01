@@ -1,5 +1,6 @@
 ## 本文用于MySQL到GAUSSDB的迁移
-
+初始开发时使用mysql数据库，现在需要将数据库迁移到华为GaussDB。
+需要注意保存建表语句和存储过程，触发器的**创建**语句
 
 在 Spring Initializr 的标准依赖列表中，没有直接提供华为 GaussDB的选项。
 
