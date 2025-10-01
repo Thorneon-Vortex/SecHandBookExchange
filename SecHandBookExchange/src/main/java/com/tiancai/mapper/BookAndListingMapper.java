@@ -1,6 +1,8 @@
 package com.tiancai.mapper;
 
-import com.tiancai.pojo.Listing;
+import com.tiancai.dto.ListingDTO;
+import com.tiancai.dto.ListingDetailDTO;
+import com.tiancai.entity.Listing;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,11 +23,21 @@ public interface BookAndListingMapper {
     /**
      * 根据条件进行分页和排序查询
      */
-    List<Listing> findPaginatedListings(
+    List<ListingDTO> findPaginatedListings(
             @Param("keyword") String keyword,
             @Param("categoryId") Integer categoryId,
             @Param("sortBy") String sortBy,
             @Param("page") Integer page,
             @Param("pageSize") Integer pageSize
     );
+
+    ListingDetailDTO findDetailById(Integer id);
+
+    void insert(Listing listing);
+
+    // 根据ID查询一个简单的Listing对象，主要用于获取seller_id
+    Listing findSimpleById(Integer id);
+
+    // 更新状态
+    void updateStatus(@Param("id") Integer id, @Param("status") String status);
 }

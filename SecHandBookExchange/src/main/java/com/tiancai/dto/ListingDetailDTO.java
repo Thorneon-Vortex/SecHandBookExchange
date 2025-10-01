@@ -1,24 +1,20 @@
-package com.tiancai.pojo;
+package com.tiancai.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Listing {
-
+public class ListingDetailDTO {
     private Integer listingId;
-    private Integer sellerId;
-    private Integer bookId;
     private BigDecimal price;
-    private String conditionDesc;
+    private String conditionDesc; // 注意：文档里是 condition，但表里是 condition_desc
     private String listingType;
     private String status;
     private LocalDateTime postTime;
     private String description;
+
+    // 嵌套对象
+    private SellerDTO seller;
+    private BookDetailDTO book;
 }

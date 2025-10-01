@@ -1,4 +1,4 @@
-package com.tiancai.pojo;
+package com.tiancai.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
