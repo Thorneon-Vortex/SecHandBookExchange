@@ -1,5 +1,6 @@
 package com.tiancai.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,10 @@ public class User {
     private Integer userId;
     private String studentId;
     private String nickname;
+    
+    @JsonIgnore  // 密码字段不应该在API响应中返回
     private String password;
+    
     private LocalDateTime registerTime;
     private String contactInfo;
     private Integer creditScore;

@@ -12,6 +12,12 @@ spring:
     username: root
     # 4. 【重点】修改为你的数据库密码
     password: 123456
+  servlet:
+    multipart:
+      #最大单个文件大小
+      max-file-size: 10MB
+      #最大请求大小
+      max-request-size: 100MB
 
 # 配置mybatis的日志输出到控制台
 mybatis:
@@ -20,3 +26,9 @@ mybatis:
     map-underscore-to-camel-case: true
   # 指定xml映射配置文件的位置
   mapper-locations: classpath:mapper/*.xml
+
+aliyun:
+  oss:
+    endpoint: https://oss-cn-beijing.aliyuncs.com
+    bucket-name: sechandbookexchange
+    region: cn-beijing

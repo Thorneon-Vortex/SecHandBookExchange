@@ -7,6 +7,8 @@ import com.tiancai.entity.Result;
 import com.tiancai.exception.ForbiddenException;
 import com.tiancai.exception.ResourceNotFoundException;
 import com.tiancai.service.BookAndListingService;
+import com.tiancai.utils.BaseContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +16,7 @@ import java.util.Map;
 
 @RequestMapping("/listings")
 @RestController
+@Slf4j
 public class BookAndListingController {
 
     @Autowired
@@ -51,23 +54,26 @@ public class BookAndListingController {
 
     @PostMapping
     public Result createListing(@RequestBody ListingCreateDTO listingCreateDTO) {
-        // 假设当前登录用户ID为1 (硬编码，实际应从Token中解析)
-        Integer currentUserId = 1;
+        // ✅ 从ThreadLocal获取当前登录用户ID（需要认证）
+        Integer currentUserId = BaseContext.getCurrentId();
+        log.info("用户 {} 发布新书籍", currentUserId);
 
         try {
             Integer newListingId = listingService.create(listingCreateDTO, currentUserId);
             // 根据API文档，data中需要返回新创建的listingId
             return Result.success(Map.of("listingId", newListingId));
         } catch (Exception e) {
-            e.printStackTrace(); // 生产环境应使用日志框架
+            log.error("发布失败", e);
             return Result.error("发布失败，请稍后重试");
         }
     }
 
     @DeleteMapping("/{id}")
     public Result deleteListing(@PathVariable Integer id) {
-        // 假设当前登录用户ID为1 (硬编码)
-        Integer currentUserId = 1;
+        // ✅ 从ThreadLocal获取当前登录用户ID（需要认证）
+        Integer currentUserId = BaseContext.getCurrentId();
+        log.info("用户 {} 删除发布信息 {}", currentUserId, id);
+        
         try {
             listingService.delete(id, currentUserId);
             return Result.success("下架成功"); // 返回成功消息
@@ -76,7 +82,7 @@ public class BookAndListingController {
         } catch (ForbiddenException e) {
             return Result.error(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace(); // 生产环境应使用日志框架
+            log.error("删除失败", e);
             return Result.error("操作失败，请稍后重试");
         }
     }

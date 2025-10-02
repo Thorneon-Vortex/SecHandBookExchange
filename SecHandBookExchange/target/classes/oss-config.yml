@@ -1,0 +1,15 @@
+# 阿里云OSS配置
+oss:
+  # 请将下面的值替换为您的真实配置
+  endpoint: https://oss-cn-beijing.aliyuncs.com
+  bucket-name: sechandbookexchange
+  region: cn-beijing
+  # 方式1：使用环境变量（推荐）
+  # 请设置环境变量 OSS_ACCESS_KEY_ID 和 OSS_ACCESS_KEY_SECRET
+  use-env-credentials: true
+  
+  # 方式2：直接配置（仅用于测试，生产环境不推荐）
+  # access-key-id: 您的AccessKeyId
+  # access-key-secret: 您的AccessKeySecret
+  # use-env-credentials: false
+
