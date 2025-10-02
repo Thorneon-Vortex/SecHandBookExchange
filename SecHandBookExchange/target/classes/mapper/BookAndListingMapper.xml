@@ -5,21 +5,6 @@
 
 <mapper namespace="com.tiancai.mapper.BookAndListingMapper">
 
-    <!-- 1. 为 findAll() 方法提供SQL语句 -->
-    <!-- id="findAll" 必须和接口方法名完全一致 -->
-    <!-- resultType="com.itheima.pojo.User" 指定了每条记录要封装成的对象类型 -->
-    <select id="findAll" resultType="com.tiancai.entity.User">
-        SELECT * FROM user_table
-    </select>
-
-    <!-- 2. 为 findById(Integer id) 方法提供SQL语句 -->
-    <!-- id="findById" 必须和接口方法名完全一致 -->
-    <!-- #{id} 表示引用传入的参数id -->
-    <select id="findById" resultType="com.tiancai.entity.User">
-        SELECT * FROM user_table WHERE id = #{id}
-    </select>
-
-    <!-- 如果还有 insert, update, delete 等方法，就继续添加 <insert>, <update>, <delete> 标签 -->
     <!-- 定义可重用的SQL片段，避免代码重复 -->
     <sql id="filterConditions">
         <!--
@@ -147,6 +132,22 @@
     <!-- 查询一个简化的Listing对象 -->
     <select id="findSimpleById" resultType="com.tiancai.entity.Listing">
         SELECT listing_id AS listingId, seller_id AS sellerId FROM listing WHERE listing_id = #{id}
+    </select>
+    
+    <!-- 查询完整的Listing对象（用于订单模块） -->
+    <select id="findById" resultType="com.tiancai.entity.Listing">
+        SELECT 
+            listing_id AS listingId,
+            seller_id AS sellerId,
+            book_id AS bookId,
+            price,
+            condition_desc AS conditionDesc,
+            listing_type AS listingType,
+            status,
+            post_time AS postTime,
+            description
+        FROM listing 
+        WHERE listing_id = #{id}
     </select>
 
     <!-- 更新状态 -->

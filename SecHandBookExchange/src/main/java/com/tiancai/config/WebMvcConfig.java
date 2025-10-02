@@ -19,9 +19,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/users/login",      // 登录
                         "/users/register",   // 注册
-                        "/listings",         // 浏览书籍列表（不需要认证）
-                        "/listings/*",       // 获取书籍详情（不需要认证）
                         "/categories"        // 获取分类（不需要认证）
+                        // 注意：/listings 的GET请求在拦截器内部判断，POST需要认证
                 ); 
     }
 }

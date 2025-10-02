@@ -54,7 +54,7 @@ public class BookAndListingController {
 
     @PostMapping
     public Result createListing(@RequestBody ListingCreateDTO listingCreateDTO) {
-        // ✅ 从ThreadLocal获取当前登录用户ID（需要认证）
+        //  从ThreadLocal获取当前登录用户ID（需要认证）
         Integer currentUserId = BaseContext.getCurrentId();
         log.info("用户 {} 发布新书籍", currentUserId);
 
@@ -70,7 +70,7 @@ public class BookAndListingController {
 
     @DeleteMapping("/{id}")
     public Result deleteListing(@PathVariable Integer id) {
-        // ✅ 从ThreadLocal获取当前登录用户ID（需要认证）
+        //  从ThreadLocal获取当前登录用户ID（需要认证）
         Integer currentUserId = BaseContext.getCurrentId();
         log.info("用户 {} 删除发布信息 {}", currentUserId, id);
         

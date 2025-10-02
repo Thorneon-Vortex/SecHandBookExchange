@@ -1,5 +1,6 @@
 package com.tiancai.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -8,7 +9,10 @@ import java.time.LocalDateTime;
 public class ListingDetailDTO {
     private Integer listingId;
     private BigDecimal price;
-    private String conditionDesc; // 注意：文档里是 condition，但表里是 condition_desc
+    
+    @JsonProperty("condition")  // 前端使用 condition，后端映射到 conditionDesc
+    private String conditionDesc;
+    
     private String listingType;
     private String status;
     private LocalDateTime postTime;

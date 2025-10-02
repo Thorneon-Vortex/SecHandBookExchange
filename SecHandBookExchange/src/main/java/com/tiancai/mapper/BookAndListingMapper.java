@@ -37,6 +37,9 @@ public interface BookAndListingMapper {
 
     // 根据ID查询一个简单的Listing对象，主要用于获取seller_id
     Listing findSimpleById(Integer id);
+    
+    // 根据ID查询完整的Listing对象（用于订单模块）
+    Listing findById(Integer id);
 
     // 更新状态
     void updateStatus(@Param("id") Integer id, @Param("status") String status);
