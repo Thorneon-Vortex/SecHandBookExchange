@@ -76,6 +76,7 @@ public class BookAndListingServiceImpl implements BookAndListingService {
     }
 
     @Override
+    @Transactional
     public void delete(Integer listingId, Integer currentUserId) {
         // 1. 检查发布信息是否存在
         Listing listing = bookAndListingMapper.findSimpleById(listingId);

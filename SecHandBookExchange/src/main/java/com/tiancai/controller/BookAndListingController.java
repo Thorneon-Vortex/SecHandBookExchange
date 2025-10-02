@@ -12,13 +12,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@RequestMapping("/listings")
 @RestController
 public class BookAndListingController {
 
     @Autowired
     private BookAndListingService listingService;
 
-    @GetMapping("/listings")
+    @GetMapping
     // 1. 将返回值从 Result<PageResult> 改为你的 Result
     public Result searchListings(
             @RequestParam(required = false) String keyword,
@@ -35,7 +36,7 @@ public class BookAndListingController {
         return Result.success(pageResult);
     }
 
-    @GetMapping("/listings/{id}")
+    @GetMapping("/{id}")
     public Result getListingById(@PathVariable Integer id) {
         ListingDetailDTO listingDetail = listingService.findById(id);
 
@@ -48,7 +49,7 @@ public class BookAndListingController {
         return Result.success(listingDetail);
     }
 
-    @PostMapping("/listings")
+    @PostMapping
     public Result createListing(@RequestBody ListingCreateDTO listingCreateDTO) {
         // 假设当前登录用户ID为1 (硬编码，实际应从Token中解析)
         Integer currentUserId = 1;
@@ -63,7 +64,7 @@ public class BookAndListingController {
         }
     }
 
-    @DeleteMapping("/listings/{id}")
+    @DeleteMapping("/{id}")
     public Result deleteListing(@PathVariable Integer id) {
         // 假设当前登录用户ID为1 (硬编码)
         Integer currentUserId = 1;
