@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tiancai.mapper.OrderMapper">
+    
+    <!-- 创建订单 -->
+    <insert id="insertOrder" useGeneratedKeys="true" keyProperty="orderId">
+        INSERT INTO orders (
+            listing_id,
+            buyer_id,
+            transaction_price,
+            order_status
+        )
+        VALUES (
+            #{listingId},
+            #{buyerId},
+            #{transactionPrice},
+            '待确认'
+        )
+    </insert>
+    
+    <!-- 根据订单ID查询订单 -->
+    <select id="findOrderById" resultType="com.tiancai.entity.Order">
+        SELECT 
+            order_id as orderId,
+            listing_id as listingId,
+            buyer_id as buyerId,
+            order_time as orderTime,
+            order_status as orderStatus,
+            transaction_price as transactionPrice
+        FROM orders
+        WHERE order_id = #{orderId}
+    </select>
+    
+    <!-- 查询我作为买家的订单列表 -->
+    <select id="findOrdersByBuyerId" resultType="com.tiancai.dto.OrderDTO">
+        SELECT 
+            o.order_id as orderId,
+            o.order_status as orderStatus,
+            o.order_time as orderTime,
+            o.transaction_price as transactionPrice,
+            b.title as bookTitle,
+            u.nickname as counterpartyNickname
+        FROM orders o
+        INNER JOIN listing l ON o.listing_id = l.listing_id
+        INNER JOIN book b ON l.book_id = b.book_id
+        INNER JOIN user u ON l.seller_id = u.user_id
+        WHERE o.buyer_id = #{buyerId}
+        ORDER BY o.order_time DESC
+    </select>
+    
+    <!-- 查询我作为卖家的订单列表 -->
+    <select id="findOrdersBySellerId" resultType="com.tiancai.dto.OrderDTO">
+        SELECT 
+            o.order_id as orderId,
+            o.order_status as orderStatus,
+            o.order_time as orderTime,
+            o.transaction_price as transactionPrice,
+            b.title as bookTitle,
+            u.nickname as counterpartyNickname
+        FROM orders o
+        INNER JOIN listing l ON o.listing_id = l.listing_id
+        INNER JOIN book b ON l.book_id = b.book_id
+        INNER JOIN user u ON o.buyer_id = u.user_id
+        WHERE l.seller_id = #{sellerId}
+        ORDER BY o.order_time DESC
+    </select>
+    
+    <!-- 更新订单状态 -->
+    <update id="updateOrderStatus">
+        UPDATE orders
+        SET order_status = #{status}
+        WHERE order_id = #{orderId}
+    </update>
+    
+    <!-- 调用存储过程完成交易 -->
+    <select id="completeTransaction" statementType="CALLABLE" parameterType="map">
+        {
+            CALL complete_transaction(
+                #{orderId, mode=IN, jdbcType=INTEGER},
+                #{resultCode, mode=OUT, jdbcType=INTEGER},
+                #{resultMessage, mode=OUT, jdbcType=VARCHAR}
+            )
+        }
+    </select>
+    
+</mapper>
+

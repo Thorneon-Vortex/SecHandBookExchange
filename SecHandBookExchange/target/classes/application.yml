@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: SecHandBookExchange
+  # MySQL DataSource Configuration
+  # --- 请将下面的值修改为你自己的配置 ---
+  datasource:
+    # 1. 修改 URL 中的数据库名 (例如: my_project)
+    #url: jdbc:mysql://localhost:3306/sechandbookexchange?useSSL=false&serverTimezone=UTC&characterEncoding=utf8
+    url: jdbc:mysql://124.70.86.207:3306/h_db23371387?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&allowPublicKeyRetrieval=true
+    # 2. 驱动通常不需要修改
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 3. 修改为你的数据库用户名 (如果不是root)
+    username: u23371387
+    # 4. 【重点】修改为你的数据库密码
+    password: Aa134429
+  servlet:
+    multipart:
+      #最大单个文件大小
+      max-file-size: 10MB
+      #最大请求大小
+      max-request-size: 100MB
+
+# 配置mybatis的日志输出到控制台
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+  # 指定xml映射配置文件的位置
+  mapper-locations: classpath:mapper/*.xml
+
+aliyun:
+  oss:
+    endpoint: https://oss-cn-beijing.aliyuncs.com
+    bucket-name: sechandbookexchange
+    region: cn-beijing

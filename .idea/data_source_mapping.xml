@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourcePerFileMappings">
+    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/160ae8d4-deca-4f4c-980a-df48a956b8e1/console.sql" value="160ae8d4-deca-4f4c-980a-df48a956b8e1" />
+    <file url="file://$PROJECT_DIR$/SecHandBookExchange/src/main/java/com/tiancai/mapper/UserMapper.java" value="160ae8d4-deca-4f4c-980a-df48a956b8e1" />
+  </component>
+</project>

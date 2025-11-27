@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tiancai.mapper.BookAndListingMapper">
+
+    <!-- 定义可重用的SQL片段，避免代码重复 -->
+    <sql id="filterConditions">
+        <!--
+            <where> 标签会自动处理开头的 'AND' 或 'OR'
+            test="..." 用于判断条件是否成立
+        -->
+        <where>
+            <!-- 关键词搜索：匹配书名、作者、ISBN -->
+            <if test="keyword != null and keyword != ''">
+                (b.title LIKE CONCAT('%', #{keyword}, '%') OR
+                b.author LIKE CONCAT('%', #{keyword}, '%') OR
+                b.isbn LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <!-- 分类筛选 -->
+            <if test="categoryId != null">
+                AND EXISTS (
+                SELECT 1 FROM book_category bc
+                WHERE bc.book_id = b.book_id AND bc.category_id = #{categoryId}
+                )
+            </if>
+            <!-- 只查询在售的商品 -->
+            AND l.status = '在售'
+        </where>
+    </sql>
+
+    <!-- 实现 countListings 方法 -->
+    <select id="countListings" resultType="java.lang.Long">
+        SELECT count(l.listing_id)
+        FROM listing l
+        JOIN book b ON l.book_id = b.book_id
+        <!-- 引用SQL片段 -->
+        <include refid="filterConditions"/>
+    </select>
+
+    <!-- 实现 findPaginatedListings 方法 -->
+    <select id="findPaginatedListings" resultType="com.tiancai.dto.ListingDTO">
+        SELECT
+        l.listing_id AS listingId,
+        b.title,
+        b.author,
+        l.price,
+        l.listing_type AS listingType,
+        l.status,
+        b.cover_image_url AS coverImageUrl,
+        u.nickname AS sellerNickname
+        FROM
+        listing l
+        JOIN book b ON l.book_id = b.book_id
+        JOIN `user` u ON l.seller_id = u.user_id
+        <!-- 引用SQL片段 -->
+        <include refid="filterConditions"/>
+
+        <!-- 动态排序 -->
+        <choose>
+            <when test="sortBy == 'price_asc'">
+                ORDER BY l.price ASC
+            </when>
+            <when test="sortBy == 'price_desc'">
+                ORDER BY l.price DESC
+            </when>
+            <otherwise>
+                <!-- 默认按发布时间降序 -->
+                ORDER BY l.post_time DESC
+            </otherwise>
+        </choose>
+
+        <!-- 分页 -->
+        LIMIT #{pageSize} OFFSET ${(page - 1) * pageSize}
+    </select>
+
+
+    <!-- ========================================================== -->
+    <!--          获取书籍发布详情功能                            -->
+    <!-- ========================================================== -->
+
+    <!-- 定义一个复杂的 ResultMap 来处理嵌套关系 -->
+    <!-- 关键点4：type 属性必须是你方法返回值 ListingDetailDTO 的全路径 -->
+    <resultMap id="ListingDetailResultMap" type="com.tiancai.dto.ListingDetailDTO">
+        <!-- 主对象字段映射 -->
+        <id property="listingId" column="listing_id"/>
+        <result property="price" column="price"/>
+        <result property="conditionDesc" column="condition_desc"/>
+        <result property="listingType" column="listing_type"/>
+        <result property="status" column="status"/>
+        <result property="postTime" column="post_time"/>
+        <result property="description" column="description"/>
+
+        <!-- 嵌套对象 seller 的映射 (假设 SellerDTO 也在 com.tiancai.dto 包下) -->
+        <association property="seller" javaType="com.tiancai.dto.SellerDTO">
+            <id property="userId" column="user_id"/>
+            <result property="nickname" column="nickname"/>
+            <result property="creditScore" column="credit_score"/>
+            <result property="contactInfo" column="contact_info"/>
+        </association>
+
+        <!-- 嵌套对象 book 的映射 (假设 BookDetailDTO 也在 com.tiancai.dto 包下) -->
+        <association property="book" javaType="com.tiancai.dto.BookDetailDTO">
+            <id property="bookId" column="book_id"/>
+            <result property="isbn" column="isbn"/>
+            <result property="title" column="title"/>
+            <result property="author" column="author"/>
+            <result property="publisher" column="publisher"/>
+        </association>
+    </resultMap>
+
+    <!-- 实现 findDetailById 方法 -->
+    <select id="findDetailById" resultMap="ListingDetailResultMap">
+        SELECT
+        l.listing_id, l.price, l.condition_desc, l.listing_type, l.status, l.post_time, l.description,
+        u.user_id, u.nickname, u.credit_score, u.contact_info,
+        b.book_id, b.isbn, b.title, b.author, b.publisher
+        FROM
+        listing l
+        JOIN `user` u ON l.seller_id = u.user_id
+        JOIN book b ON l.book_id = b.book_id
+        WHERE
+        l.listing_id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="listingId">
+        INSERT INTO listing (seller_id, book_id, price, condition_desc, listing_type, description)
+        VALUES (#{sellerId}, #{bookId}, #{price}, #{conditionDesc}, #{listingType}, #{description})
+    </insert>
+
+    <!-- 查询一个简化的Listing对象 -->
+    <select id="findSimpleById" resultType="com.tiancai.entity.Listing">
+        SELECT listing_id AS listingId, seller_id AS sellerId FROM listing WHERE listing_id = #{id}
+    </select>
+    
+    <!-- 查询完整的Listing对象（用于订单模块） -->
+    <select id="findById" resultType="com.tiancai.entity.Listing">
+        SELECT 
+            listing_id AS listingId,
+            seller_id AS sellerId,
+            book_id AS bookId,
+            price,
+            condition_desc AS conditionDesc,
+            listing_type AS listingType,
+            status,
+            post_time AS postTime,
+            description
+        FROM listing 
+        WHERE listing_id = #{id}
+    </select>
+
+    <!-- 更新状态 -->
+    <update id="updateStatus">
+        UPDATE listing SET status = #{status} WHERE listing_id = #{id}
+    </update>
+
+</mapper>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tiancai.mapper.BookMapper">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="bookId">
+        INSERT INTO book (
+        isbn,
+        title,
+        author,
+        publisher,
+        publication_year,
+        cover_image_url
+        )
+        VALUES (
+        #{isbn},
+        #{title},
+        #{author},
+        #{publisher},
+        #{publicationYear},
+        #{coverImageUrl}
+        )
+    </insert>
+    <select id="findByIsbn" resultType="com.tiancai.entity.Book">
+        SELECT * FROM book WHERE isbn = #{isbn}
+    </select>
+    
+    <!-- 插入书籍和分类的关联 -->
+    <insert id="insertBookCategory">
+        INSERT INTO book_category (book_id, category_id)
+        VALUES (#{param1}, #{param2})
+    </insert>
+</mapper>
