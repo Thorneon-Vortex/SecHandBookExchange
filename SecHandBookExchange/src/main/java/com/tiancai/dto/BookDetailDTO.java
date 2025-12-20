@@ -9,4 +9,6 @@ public class BookDetailDTO {
     private String title;
     private String author;
     private String publisher;
+    private Integer publicationYear;
+    private String coverImageUrl;
 }

@@ -85,5 +85,34 @@
         }
     </select>
     
+    <!-- ========================================================== -->
+    <!--          B端管理功能                                      -->
+    <!-- ========================================================== -->
+    
+    <!-- B端：统计订单总数 -->
+    <select id="countOrders" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM orders
+        <if test="status != null and status != ''">
+            WHERE order_status = #{status}
+        </if>
+    </select>
+    
+    <!-- B端：分页查询订单列表 -->
+    <select id="findOrdersWithPagination" resultType="com.tiancai.entity.Order">
+        SELECT 
+            order_id as orderId,
+            listing_id as listingId,
+            buyer_id as buyerId,
+            order_time as orderTime,
+            order_status as orderStatus,
+            transaction_price as transactionPrice
+        FROM orders
+        <if test="status != null and status != ''">
+            WHERE order_status = #{status}
+        </if>
+        ORDER BY order_time DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+    
 </mapper>
 

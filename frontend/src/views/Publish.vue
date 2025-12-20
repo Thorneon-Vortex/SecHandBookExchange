@@ -74,25 +74,45 @@
           <el-text type="danger" style="margin-left: 10px">* 必选</el-text>
         </el-form-item>
 
-        <el-form-item label="封面图片URL" prop="coverImageUrl">
-          <el-input
-            v-model="publishForm.coverImageUrl"
-            placeholder="请输入封面图片URL（可选）"
-            clearable
-          />
-          <div v-if="publishForm.coverImageUrl" style="margin-top: 10px">
-            <el-image
-              :src="publishForm.coverImageUrl"
-              fit="contain"
-              style="width: 150px; height: 200px"
+        <el-form-item label="封面图片" prop="coverImageUrl">
+          <div class="cover-upload-container">
+            <!-- 上传区域 -->
+            <el-upload
+              class="cover-uploader"
+              :show-file-list="false"
+              :before-upload="beforeUpload"
+              :http-request="handleUpload"
+              accept="image/*"
             >
-              <template #error>
-                <div class="image-error">
-                  <el-icon><Picture /></el-icon>
-                  <p>加载失败</p>
+              <div v-if="publishForm.coverImageUrl" class="cover-preview">
+                <el-image
+                  :src="publishForm.coverImageUrl"
+                  fit="cover"
+                  class="cover-image"
+                />
+                <div class="cover-mask">
+                  <el-icon><Refresh /></el-icon>
+                  <span>重新上传</span>
                 </div>
-              </template>
-            </el-image>
+              </div>
+              <div v-else class="cover-placeholder" v-loading="uploading">
+                <el-icon class="upload-icon"><Plus /></el-icon>
+                <div class="upload-text">点击上传封面</div>
+                <div class="upload-tip">支持 JPG、PNG 格式</div>
+              </div>
+            </el-upload>
+            
+            <!-- 删除按钮 -->
+            <el-button
+              v-if="publishForm.coverImageUrl"
+              type="danger"
+              size="small"
+              :icon="Delete"
+              @click="handleRemoveImage"
+              style="margin-top: 10px"
+            >
+              删除图片
+            </el-button>
           </div>
         </el-form-item>
 
@@ -180,12 +200,15 @@ import { ref, reactive, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { createListing } from '@/api/listing'
 import { getCategories } from '@/api/category'
+import { uploadImage } from '@/api/upload'
 import { ElMessage } from 'element-plus'
+import { Delete, Plus, Refresh } from '@element-plus/icons-vue'
 
 const router = useRouter()
 
 const publishFormRef = ref()
 const loading = ref(false)
+const uploading = ref(false)
 const categoriesLoading = ref(false)
 const categories = ref([])
 
@@ -277,6 +300,44 @@ const handlePublish = async () => {
 
 const handleReset = () => {
   publishFormRef.value?.resetFields()
+  publishForm.coverImageUrl = ''
+}
+
+// 上传前验证
+const beforeUpload = (file) => {
+  const isImage = file.type.startsWith('image/')
+  const isLt5M = file.size / 1024 / 1024 < 5
+
+  if (!isImage) {
+    ElMessage.error('只能上传图片文件！')
+    return false
+  }
+  if (!isLt5M) {
+    ElMessage.error('图片大小不能超过 5MB！')
+    return false
+  }
+  return true
+}
+
+// 处理图片上传
+const handleUpload = async ({ file }) => {
+  uploading.value = true
+  try {
+    const res = await uploadImage(file)
+    publishForm.coverImageUrl = res.data
+    ElMessage.success('图片上传成功！')
+  } catch (error) {
+    console.error('上传失败:', error)
+    ElMessage.error('图片上传失败，请重试')
+  } finally {
+    uploading.value = false
+  }
+}
+
+// 删除已上传的图片
+const handleRemoveImage = () => {
+  publishForm.coverImageUrl = ''
+  ElMessage.info('图片已删除')
 }
 
 onMounted(() => {
@@ -290,24 +351,93 @@ onMounted(() => {
   margin: 0 auto;
 }
 
-.image-error {
+.cover-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.cover-uploader {
+  width: 180px;
+  height: 240px;
+}
+
+.cover-uploader :deep(.el-upload) {
+  width: 180px;
+  height: 240px;
+  border: 2px dashed #d9d9d9;
+  border-radius: 8px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.cover-uploader :deep(.el-upload:hover) {
+  border-color: #409eff;
+}
+
+.cover-preview {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.cover-image {
+  width: 100%;
+  height: 100%;
+}
+
+.cover-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.cover-preview:hover .cover-mask {
+  opacity: 1;
+}
+
+.cover-mask .el-icon {
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+
+.cover-placeholder {
   width: 100%;
   height: 100%;
-  background: #f5f7fa;
-  color: #c0c4cc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #8c939d;
 }
 
-.image-error .el-icon {
+.upload-icon {
   font-size: 40px;
+  color: #8c939d;
+  margin-bottom: 10px;
 }
 
-.image-error p {
-  margin-top: 10px;
+.upload-text {
+  font-size: 14px;
+  color: #606266;
+  margin-bottom: 5px;
+}
+
+.upload-tip {
   font-size: 12px;
+  color: #909399;
 }
 </style>
 

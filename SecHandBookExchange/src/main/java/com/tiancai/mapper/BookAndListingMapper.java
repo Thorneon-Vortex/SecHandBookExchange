@@ -13,7 +13,7 @@ public interface BookAndListingMapper {
     //搜索/浏览书籍发布信息
     //List<Listing> searchBook(String bookName);
     /**
-     * 根据条件统计总记录数
+     * 根据条件统计总记录数（C端用，支持categoryId）
      */
     Long countListings(
             @Param("keyword") String keyword,
@@ -43,4 +43,22 @@ public interface BookAndListingMapper {
 
     // 更新状态
     void updateStatus(@Param("id") Integer id, @Param("status") String status);
+    
+    /**
+     * 统计书籍总数（B端用，支持status筛选）
+     */
+    Long countListingsForAdmin(@Param("keyword") String keyword, @Param("status") String status);
+    
+    /**
+     * 分页查询书籍列表（B端用，包含书名信息）
+     */
+    List<com.tiancai.dto.AdminListingDTO> findListingsWithPaginationForAdmin(@Param("offset") Integer offset,
+                                                                              @Param("pageSize") Integer pageSize,
+                                                                              @Param("keyword") String keyword,
+                                                                              @Param("status") String status);
+    
+    /**
+     * 更新书籍状态（B端用）
+     */
+    void updateListingStatus(@Param("listingId") Integer listingId, @Param("status") String status);
 }

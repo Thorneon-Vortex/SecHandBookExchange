@@ -35,4 +35,3 @@ export const updateUserInfo = (data) => {
   })
 }
 
-

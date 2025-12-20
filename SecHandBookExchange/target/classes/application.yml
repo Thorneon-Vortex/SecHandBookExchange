@@ -5,8 +5,7 @@ spring:
   # --- 请将下面的值修改为你自己的配置 ---
   datasource:
     # 1. 修改 URL 中的数据库名 (例如: my_project)
-    #url: jdbc:mysql://localhost:3306/sechandbookexchange?useSSL=false&serverTimezone=UTC&characterEncoding=utf8
-    url: jdbc:mysql://124.70.86.207:3306/h_db23371387?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://124.70.86.207:3306/h_db23371387?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     # 2. 驱动通常不需要修改
     driver-class-name: com.mysql.cj.jdbc.Driver
     # 3. 修改为你的数据库用户名 (如果不是root)
@@ -33,3 +32,9 @@ aliyun:
     endpoint: https://oss-cn-beijing.aliyuncs.com
     bucket-name: sechandbookexchange
     region: cn-beijing
+
+# DeepSeek AI 配置
+deepseek:
+  api-key: sk-315be534c7ed47479edd009ed2c6c777
+  base-url: https://api.deepseek.com
+  model: deepseek-chat

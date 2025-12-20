@@ -40,5 +40,17 @@ public interface OrderMapper {
      * 调用存储过程完成交易
      */
     void completeTransaction(Map<String, Object> params);
+    
+    /**
+     * 统计订单总数（B端用）
+     */
+    Long countOrders(@Param("status") String status);
+    
+    /**
+     * 分页查询订单列表（B端用）
+     */
+    List<Order> findOrdersWithPagination(@Param("offset") Integer offset,
+                                        @Param("pageSize") Integer pageSize,
+                                        @Param("status") String status);
 }
 

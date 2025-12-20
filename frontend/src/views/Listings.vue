@@ -109,7 +109,7 @@
             v-model:current-page="searchForm.page"
             v-model:page-size="searchForm.pageSize"
             :total="total"
-            :page-sizes="[10, 20, 50]"
+            :page-sizes="[8, 16, 32]"
             layout="total, sizes, prev, pager, next, jumper"
             @current-change="fetchListings"
             @size-change="fetchListings"
@@ -139,7 +139,7 @@ const searchForm = reactive({
   categoryId: route.query.categoryId ? Number(route.query.categoryId) : undefined,
   sortBy: 'time_desc',
   page: 1,
-  pageSize: 20
+  pageSize: 8
 })
 
 const fetchCategories = async () => {
@@ -345,5 +345,4 @@ onMounted(() => {
   justify-content: center;
 }
 </style>
-
 

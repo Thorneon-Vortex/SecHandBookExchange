@@ -62,6 +62,9 @@
     <el-footer class="footer">
       <p>© 2025 校园二手书交易平台 | 让知识循环起来</p>
     </el-footer>
+    
+    <!-- AI 智能客服 -->
+    <AiAssistant />
   </div>
 </template>
 
@@ -70,6 +73,7 @@ import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import AiAssistant from '@/components/AiAssistant.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -187,5 +191,4 @@ const handleCommand = (command) => {
   line-height: 60px;
 }
 </style>
-
 

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tiancai.mapper.AdminMapper">
+
+    <resultMap id="AdminResultMap" type="com.tiancai.entity.Admin">
+        <id property="adminId" column="admin_id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="role" column="role"/>
+        <result property="createdTime" column="created_time"/>
+        <result property="lastLoginTime" column="last_login_time"/>
+    </resultMap>
+
+    <select id="findByUsername" resultMap="AdminResultMap">
+        SELECT admin_id, username, password, role, created_time, last_login_time
+        FROM admin
+        WHERE username = #{username}
+    </select>
+
+    <select id="findById" resultMap="AdminResultMap">
+        SELECT admin_id, username, password, role, created_time, last_login_time
+        FROM admin
+        WHERE admin_id = #{adminId}
+    </select>
+
+    <update id="updateLastLoginTime">
+        UPDATE admin
+        SET last_login_time = NOW()
+        WHERE admin_id = #{adminId}
+    </update>
+
+</mapper>
+
+
