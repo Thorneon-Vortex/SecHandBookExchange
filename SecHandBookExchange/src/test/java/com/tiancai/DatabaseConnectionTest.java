@@ -26,7 +26,7 @@ public class DatabaseConnectionTest {
         System.out.println("========================================\n");
 
         try (Connection conn = dataSource.getConnection()) {
-            System.out.println("✅ 数据库连接成功！");
+            System.out.println(" 数据库连接成功！");
             System.out.println("   数据库URL: " + conn.getMetaData().getURL());
             System.out.println("   用户名: " + conn.getMetaData().getUserName());
             System.out.println("   数据库产品: " + conn.getMetaData().getDatabaseProductName());
@@ -46,7 +46,7 @@ public class DatabaseConnectionTest {
             countData(conn);
 
         } catch (Exception e) {
-            System.out.println("❌ 数据库连接失败！");
+            System.out.println(" 数据库连接失败！");
             System.out.println("   错误信息: " + e.getMessage());
             e.printStackTrace();
         }
