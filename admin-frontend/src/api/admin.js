@@ -68,3 +68,6 @@ export const textToSqlQuery = (query) => {
     data: { query }
   })
 }
+
+// 数据查询（Text-to-SQL的别名）
+export const dataQuery = textToSqlQuery

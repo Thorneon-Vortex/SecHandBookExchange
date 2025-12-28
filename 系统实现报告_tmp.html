@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>系统实现报告.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86%E5%A4%A7%E4%BD%9C%E4%B8%9A---%E7%B3%BB%E7%BB%9F%E5%AE%9E%E7%8E%B0%E6%8A%A5%E5%91%8A">《数据库系统原理》大作业 - 系统实现报告</h1>
+<h2 id="%E9%A2%98%E7%9B%AE%E5%90%8D%E7%A7%B0%E6%A0%A1%E5%9B%AD%E4%BA%8C%E6%89%8B%E4%B9%A6%E4%BA%A4%E6%98%93%E4%B8%8E%E5%88%86%E4%BA%AB%E5%B9%B3%E5%8F%B0">题目名称：校园二手书交易与分享平台</h2>
+<hr>
+<h2 id="%E4%B8%80%E6%95%B0%E6%8D%AE%E5%BA%93%E5%9F%BA%E6%9C%AC%E8%A1%A8%E7%9A%84%E5%AE%9A%E4%B9%89">一、数据库基本表的定义</h2>
+<h3 id="1-%E7%94%A8%E6%88%B7%E8%A1%A8-user">1. 用户表 (User)</h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-string">`user`</span> (
+  <span class="hljs-string">`user_id`</span> <span class="hljs-built_in">INT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> AUTO_INCREMENT <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'用户ID, 主键'</span>,
+  <span class="hljs-string">`student_id`</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">20</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'学号, 唯一'</span>,
+  <span class="hljs-string">`nickname`</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">50</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'昵称'</span>,
+  <span class="hljs-string">`password`</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">255</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'密码 (加密存储)'</span>,
+  <span class="hljs-string">`register_time`</span> DATETIME <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">CURRENT_TIMESTAMP</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'注册时间'</span>,
+  <span class="hljs-string">`contact_info`</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">100</span>) <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'联系方式'</span>,
+  <span class="hljs-string">`credit_score`</span> <span class="hljs-built_in">INT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-number">100</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'信誉积分'</span>,
+  PRIMARY <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`user_id`</span>),
+  <span class="hljs-keyword">UNIQUE</span> <span class="hljs-keyword">INDEX</span> <span class="hljs-string">`uk_student_id`</span> (<span class="hljs-string">`student_id`</span> <span class="hljs-keyword">ASC</span>)
+) <span class="hljs-keyword">ENGINE</span>=<span class="hljs-keyword">InnoDB</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">CHARSET</span>=utf8mb4 <span class="hljs-keyword">COMMENT</span>=<span class="hljs-string">'用户表'</span>;
+</div></code></pre>
+<h3 id="2-%E4%B9%A6%E7%B1%8D%E5%88%86%E7%B1%BB%E8%A1%A8-category">2. 书籍分类表 (Category)</h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-string">`category`</span> (
+  <span class="hljs-string">`category_id`</span> <span class="hljs-built_in">INT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> AUTO_INCREMENT <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'分类ID, 主键'</span>,
+  <span class="hljs-string">`category_name`</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">50</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'分类名称'</span>,
+  PRIMARY <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`category_id`</span>),
+  <span class="hljs-keyword">UNIQUE</span> <span class="hljs-keyword">INDEX</span> <span class="hljs-string">`uk_category_name`</span> (<span class="hljs-string">`category_name`</span> <span class="hljs-keyword">ASC</span>)
+) <span class="hljs-keyword">ENGINE</span>=<span class="hljs-keyword">InnoDB</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">CHARSET</span>=utf8mb4 <span class="hljs-keyword">COMMENT</span>=<span class="hljs-string">'书籍分类表'</span>;
+</div></code></pre>
+<h3 id="3-%E4%B9%A6%E7%B1%8D%E4%BF%A1%E6%81%AF%E8%A1%A8-book">3. 书籍信息表 (Book)</h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-string">`book`</span> (
+  <span class="hljs-string">`book_id`</span> <span class="hljs-built_in">INT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> AUTO_INCREMENT <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'书籍ID, 主键'</span>,
+  <span class="hljs-string">`isbn`</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">20</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'ISBN, 唯一'</span>,
+  <span class="hljs-string">`title`</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">255</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'书名'</span>,
+  <span class="hljs-string">`author`</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">100</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'作者'</span>,
+  <span class="hljs-string">`publisher`</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">100</span>) <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'出版社'</span>,
+  <span class="hljs-string">`publication_year`</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">10</span>) <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'出版年份'</span>,
+  <span class="hljs-string">`cover_image_url`</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">512</span>) <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'封面图片URL'</span>,
+  PRIMARY <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`book_id`</span>),
+  <span class="hljs-keyword">UNIQUE</span> <span class="hljs-keyword">INDEX</span> <span class="hljs-string">`uk_isbn`</span> (<span class="hljs-string">`isbn`</span> <span class="hljs-keyword">ASC</span>)
+) <span class="hljs-keyword">ENGINE</span>=<span class="hljs-keyword">InnoDB</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">CHARSET</span>=utf8mb4 <span class="hljs-keyword">COMMENT</span>=<span class="hljs-string">'书籍基本信息表'</span>;
+</div></code></pre>
+<h3 id="4-%E4%B9%A6%E7%B1%8D%E4%B8%8E%E5%88%86%E7%B1%BB%E5%85%B3%E8%81%94%E8%A1%A8-bookcategory">4. 书籍与分类关联表 (Book_Category)</h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-string">`book_category`</span> (
+  <span class="hljs-string">`book_id`</span> <span class="hljs-built_in">INT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'书籍ID, 外键'</span>,
+  <span class="hljs-string">`category_id`</span> <span class="hljs-built_in">INT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'分类ID, 外键'</span>,
+  PRIMARY <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`book_id`</span>, <span class="hljs-string">`category_id`</span>),
+  <span class="hljs-keyword">INDEX</span> <span class="hljs-string">`fk_book_category_category_idx`</span> (<span class="hljs-string">`category_id`</span> <span class="hljs-keyword">ASC</span>),
+  <span class="hljs-keyword">CONSTRAINT</span> <span class="hljs-string">`fk_book_category_book`</span>
+    <span class="hljs-keyword">FOREIGN</span> <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`book_id`</span>) <span class="hljs-keyword">REFERENCES</span> <span class="hljs-string">`book`</span> (<span class="hljs-string">`book_id`</span>)
+    <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">CASCADE</span> <span class="hljs-keyword">ON</span> <span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">CASCADE</span>,
+  <span class="hljs-keyword">CONSTRAINT</span> <span class="hljs-string">`fk_book_category_category`</span>
+    <span class="hljs-keyword">FOREIGN</span> <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`category_id`</span>) <span class="hljs-keyword">REFERENCES</span> <span class="hljs-string">`category`</span> (<span class="hljs-string">`category_id`</span>)
+    <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">CASCADE</span> <span class="hljs-keyword">ON</span> <span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">CASCADE</span>
+) <span class="hljs-keyword">ENGINE</span>=<span class="hljs-keyword">InnoDB</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">CHARSET</span>=utf8mb4 <span class="hljs-keyword">COMMENT</span>=<span class="hljs-string">'书籍与分类的关联表'</span>;
+</div></code></pre>
+<h3 id="5-%E5%8F%91%E5%B8%83%E4%BF%A1%E6%81%AF%E8%A1%A8-listing">5. 发布信息表 (Listing)</h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-string">`listing`</span> (
+  <span class="hljs-string">`listing_id`</span> <span class="hljs-built_in">INT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> AUTO_INCREMENT <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'发布ID, 主键'</span>,
+  <span class="hljs-string">`seller_id`</span> <span class="hljs-built_in">INT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'发布者ID, 外键'</span>,
+  <span class="hljs-string">`book_id`</span> <span class="hljs-built_in">INT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'书籍ID, 外键'</span>,
+  <span class="hljs-string">`price`</span> <span class="hljs-built_in">DECIMAL</span>(<span class="hljs-number">10</span>,<span class="hljs-number">2</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'价格'</span>,
+  <span class="hljs-string">`condition_desc`</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">20</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'新旧程度'</span>,
+  <span class="hljs-string">`listing_type`</span> ENUM(<span class="hljs-string">'出售'</span>, <span class="hljs-string">'赠送'</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'发布类型'</span>,
+  <span class="hljs-string">`status`</span> ENUM(<span class="hljs-string">'在售'</span>, <span class="hljs-string">'已预定'</span>, <span class="hljs-string">'已售出'</span>, <span class="hljs-string">'已下架'</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-string">'在售'</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'状态'</span>,
+  <span class="hljs-string">`post_time`</span> DATETIME <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">CURRENT_TIMESTAMP</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'发布时间'</span>,
+  <span class="hljs-string">`description`</span> <span class="hljs-built_in">TEXT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'详细描述'</span>,
+  PRIMARY <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`listing_id`</span>),
+  <span class="hljs-keyword">INDEX</span> <span class="hljs-string">`fk_listing_user_idx`</span> (<span class="hljs-string">`seller_id`</span> <span class="hljs-keyword">ASC</span>),
+  <span class="hljs-keyword">INDEX</span> <span class="hljs-string">`fk_listing_book_idx`</span> (<span class="hljs-string">`book_id`</span> <span class="hljs-keyword">ASC</span>),
+  <span class="hljs-keyword">CONSTRAINT</span> <span class="hljs-string">`fk_listing_user`</span>
+    <span class="hljs-keyword">FOREIGN</span> <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`seller_id`</span>) <span class="hljs-keyword">REFERENCES</span> <span class="hljs-string">`user`</span> (<span class="hljs-string">`user_id`</span>)
+    <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">CASCADE</span> <span class="hljs-keyword">ON</span> <span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">CASCADE</span>,
+  <span class="hljs-keyword">CONSTRAINT</span> <span class="hljs-string">`fk_listing_book`</span>
+    <span class="hljs-keyword">FOREIGN</span> <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`book_id`</span>) <span class="hljs-keyword">REFERENCES</span> <span class="hljs-string">`book`</span> (<span class="hljs-string">`book_id`</span>)
+    <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">CASCADE</span> <span class="hljs-keyword">ON</span> <span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">CASCADE</span>
+) <span class="hljs-keyword">ENGINE</span>=<span class="hljs-keyword">InnoDB</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">CHARSET</span>=utf8mb4 <span class="hljs-keyword">COMMENT</span>=<span class="hljs-string">'书籍发布信息表'</span>;
+</div></code></pre>
+<h3 id="6-%E8%AE%A2%E5%8D%95%E8%A1%A8-orders">6. 订单表 (Orders)</h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-string">`orders`</span> (
+  <span class="hljs-string">`order_id`</span> <span class="hljs-built_in">INT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> AUTO_INCREMENT <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'订单ID, 主键'</span>,
+  <span class="hljs-string">`listing_id`</span> <span class="hljs-built_in">INT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'发布ID, 外键'</span>,
+  <span class="hljs-string">`buyer_id`</span> <span class="hljs-built_in">INT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'购买者ID, 外键'</span>,
+  <span class="hljs-string">`order_time`</span> DATETIME <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">CURRENT_TIMESTAMP</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'下单时间'</span>,
+  <span class="hljs-string">`order_status`</span> ENUM(<span class="hljs-string">'待确认'</span>, <span class="hljs-string">'已完成'</span>, <span class="hljs-string">'已取消'</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-string">'待确认'</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'订单状态'</span>,
+  <span class="hljs-string">`transaction_price`</span> <span class="hljs-built_in">DECIMAL</span>(<span class="hljs-number">10</span>,<span class="hljs-number">2</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'交易价格'</span>,
+  PRIMARY <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`order_id`</span>),
+  <span class="hljs-keyword">INDEX</span> <span class="hljs-string">`fk_order_listing_idx`</span> (<span class="hljs-string">`listing_id`</span> <span class="hljs-keyword">ASC</span>),
+  <span class="hljs-keyword">INDEX</span> <span class="hljs-string">`fk_order_user_idx`</span> (<span class="hljs-string">`buyer_id`</span> <span class="hljs-keyword">ASC</span>),
+  <span class="hljs-keyword">CONSTRAINT</span> <span class="hljs-string">`fk_order_listing`</span>
+    <span class="hljs-keyword">FOREIGN</span> <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`listing_id`</span>) <span class="hljs-keyword">REFERENCES</span> <span class="hljs-string">`listing`</span> (<span class="hljs-string">`listing_id`</span>)
+    <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> RESTRICT <span class="hljs-keyword">ON</span> <span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">CASCADE</span>,
+  <span class="hljs-keyword">CONSTRAINT</span> <span class="hljs-string">`fk_order_user`</span>
+    <span class="hljs-keyword">FOREIGN</span> <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`buyer_id`</span>) <span class="hljs-keyword">REFERENCES</span> <span class="hljs-string">`user`</span> (<span class="hljs-string">`user_id`</span>)
+    <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> RESTRICT <span class="hljs-keyword">ON</span> <span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">CASCADE</span>
+) <span class="hljs-keyword">ENGINE</span>=<span class="hljs-keyword">InnoDB</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">CHARSET</span>=utf8mb4 <span class="hljs-keyword">COMMENT</span>=<span class="hljs-string">'交易订单表'</span>;
+</div></code></pre>
+<h3 id="7-%E8%AF%84%E8%AE%BA%E8%A1%A8-comment">7. 评论表 (Comment)</h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-string">`comment`</span> (
+  <span class="hljs-string">`comment_id`</span> <span class="hljs-built_in">INT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> AUTO_INCREMENT <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'评论ID, 主键'</span>,
+  <span class="hljs-string">`listing_id`</span> <span class="hljs-built_in">INT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'发布ID, 外键'</span>,
+  <span class="hljs-string">`user_id`</span> <span class="hljs-built_in">INT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'评论者ID, 外键'</span>,
+  <span class="hljs-string">`content`</span> <span class="hljs-built_in">TEXT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'评论内容'</span>,
+  <span class="hljs-string">`comment_time`</span> DATETIME <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">CURRENT_TIMESTAMP</span> <span class="hljs-keyword">COMMENT</span> <span class="hljs-string">'评论时间'</span>,
+  PRIMARY <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`comment_id`</span>),
+  <span class="hljs-keyword">INDEX</span> <span class="hljs-string">`fk_comment_listing_idx`</span> (<span class="hljs-string">`listing_id`</span> <span class="hljs-keyword">ASC</span>),
+  <span class="hljs-keyword">INDEX</span> <span class="hljs-string">`fk_comment_user_idx`</span> (<span class="hljs-string">`user_id`</span> <span class="hljs-keyword">ASC</span>),
+  <span class="hljs-keyword">CONSTRAINT</span> <span class="hljs-string">`fk_comment_listing`</span>
+    <span class="hljs-keyword">FOREIGN</span> <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`listing_id`</span>) <span class="hljs-keyword">REFERENCES</span> <span class="hljs-string">`listing`</span> (<span class="hljs-string">`listing_id`</span>)
+    <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">CASCADE</span> <span class="hljs-keyword">ON</span> <span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">CASCADE</span>,
+  <span class="hljs-keyword">CONSTRAINT</span> <span class="hljs-string">`fk_comment_user`</span>
+    <span class="hljs-keyword">FOREIGN</span> <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`user_id`</span>) <span class="hljs-keyword">REFERENCES</span> <span class="hljs-string">`user`</span> (<span class="hljs-string">`user_id`</span>)
+    <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">CASCADE</span> <span class="hljs-keyword">ON</span> <span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">CASCADE</span>
+) <span class="hljs-keyword">ENGINE</span>=<span class="hljs-keyword">InnoDB</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">CHARSET</span>=utf8mb4 <span class="hljs-keyword">COMMENT</span>=<span class="hljs-string">'评论留言表'</span>;
+</div></code></pre>
+<hr>
+<h2 id="%E4%BA%8C%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E7%9A%84%E6%95%B0%E6%8D%AE%E6%93%8D%E4%BD%9C%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%B3%95%E4%B8%8E%E7%BB%93%E6%9E%9C">二、系统功能的数据操作实现方法与结果</h2>
+<h3 id="1-%E7%94%A8%E6%88%B7%E6%A8%A1%E5%9D%97">1. 用户模块</h3>
+<h4 id="11-%E7%94%A8%E6%88%B7%E6%B3%A8%E5%86%8C">1.1 用户注册</h4>
+<p><strong>实现方式</strong>：直接 SQL 插入</p>
+<p><strong>MyBatis Mapper</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-tag">&lt;<span class="hljs-name">insert</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"insert"</span> <span class="hljs-attr">useGeneratedKeys</span>=<span class="hljs-string">"true"</span> <span class="hljs-attr">keyProperty</span>=<span class="hljs-string">"userId"</span>&gt;</span>
+    INSERT INTO user (student_id, nickname, password, contact_info)
+    VALUES (#{studentId}, #{nickname}, #{password}, #{contactInfo})
+<span class="hljs-tag">&lt;/<span class="hljs-name">insert</span>&gt;</span>
+</div></code></pre>
+<p><strong>Java Service 代码</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-meta">@Service</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserServiceImpl</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">UserService</span> </span>{
+    <span class="hljs-meta">@Autowired</span>
+    <span class="hljs-keyword">private</span> UserMapper userMapper;
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-meta">@Transactional</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> User <span class="hljs-title">register</span><span class="hljs-params">(UserRegisterDTO dto)</span> </span>{
+        <span class="hljs-comment">// 检查学号是否已存在</span>
+        User existing = userMapper.findByStudentId(dto.getStudentId());
+        <span class="hljs-keyword">if</span> (existing != <span class="hljs-keyword">null</span>) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> BusinessException(<span class="hljs-string">"该学号已被注册"</span>);
+        }
+        
+        User user = <span class="hljs-keyword">new</span> User();
+        user.setStudentId(dto.getStudentId());
+        user.setNickname(dto.getNickname());
+        user.setPassword(dto.getPassword()); <span class="hljs-comment">// 实际应加密</span>
+        user.setContactInfo(dto.getContactInfo());
+        
+        userMapper.insert(user);
+        <span class="hljs-keyword">return</span> user;
+    }
+}
+</div></code></pre>
+<p><strong>执行结果</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// 请求</span>
+POST /users/register
+{
+  <span class="hljs-attr">"studentId"</span>: <span class="hljs-string">"21371001"</span>,
+  <span class="hljs-attr">"nickname"</span>: <span class="hljs-string">"爱书的同学"</span>,
+  <span class="hljs-attr">"password"</span>: <span class="hljs-string">"password123"</span>,
+  <span class="hljs-attr">"contactInfo"</span>: <span class="hljs-string">"QQ:123456"</span>
+}
+
+<span class="hljs-comment">// 响应</span>
+{
+  <span class="hljs-attr">"code"</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-attr">"msg"</span>: <span class="hljs-string">"success"</span>,
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"userId"</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-attr">"studentId"</span>: <span class="hljs-string">"21371001"</span>
+  }
+}
+</div></code></pre>
+<h4 id="12-%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95">1.2 用户登录</h4>
+<p><strong>实现方式</strong>：查询验证 + JWT Token 生成</p>
+<p><strong>MyBatis Mapper</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"findByStudentId"</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">"com.tiancai.entity.User"</span>&gt;</span>
+    SELECT user_id AS userId, student_id AS studentId, nickname, 
+           password, credit_score AS creditScore, contact_info AS contactInfo
+    FROM user 
+    WHERE student_id = #{studentId}
+<span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span>
+</div></code></pre>
+<p><strong>执行结果</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// 请求</span>
+POST /users/login
+{
+  <span class="hljs-attr">"studentId"</span>: <span class="hljs-string">"21371001"</span>,
+  <span class="hljs-attr">"password"</span>: <span class="hljs-string">"password123"</span>
+}
+
+<span class="hljs-comment">// 响应</span>
+{
+  <span class="hljs-attr">"code"</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-attr">"msg"</span>: <span class="hljs-string">"success"</span>,
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"token"</span>: <span class="hljs-string">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."</span>,
+    <span class="hljs-attr">"userId"</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-attr">"nickname"</span>: <span class="hljs-string">"爱书的同学"</span>
+  }
+}
+</div></code></pre>
+<hr>
+<h3 id="2-%E4%B9%A6%E7%B1%8D%E4%B8%8E%E5%8F%91%E5%B8%83%E6%A8%A1%E5%9D%97">2. 书籍与发布模块</h3>
+<h4 id="21-%E6%90%9C%E7%B4%A2%E6%B5%8F%E8%A7%88%E4%B9%A6%E7%B1%8D">2.1 搜索/浏览书籍</h4>
+<p><strong>实现方式</strong>：动态 SQL 查询，支持分页、筛选、排序</p>
+<p><strong>MyBatis Mapper</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-tag">&lt;<span class="hljs-name">sql</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"filterConditions"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">where</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">if</span> <span class="hljs-attr">test</span>=<span class="hljs-string">"keyword != null and keyword != ''"</span>&gt;</span>
+            (b.title LIKE CONCAT('%', #{keyword}, '%') OR
+            b.author LIKE CONCAT('%', #{keyword}, '%') OR
+            b.isbn LIKE CONCAT('%', #{keyword}, '%'))
+        <span class="hljs-tag">&lt;/<span class="hljs-name">if</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">if</span> <span class="hljs-attr">test</span>=<span class="hljs-string">"categoryId != null"</span>&gt;</span>
+            AND EXISTS (
+                SELECT 1 FROM book_category bc
+                WHERE bc.book_id = b.book_id AND bc.category_id = #{categoryId}
+            )
+        <span class="hljs-tag">&lt;/<span class="hljs-name">if</span>&gt;</span>
+        AND l.status = '在售'
+    <span class="hljs-tag">&lt;/<span class="hljs-name">where</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">sql</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"findPaginatedListings"</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">"com.tiancai.dto.ListingDTO"</span>&gt;</span>
+    SELECT
+        l.listing_id AS listingId,
+        b.title, b.author, l.price,
+        l.listing_type AS listingType,
+        l.status,
+        b.cover_image_url AS coverImageUrl,
+        u.nickname AS sellerNickname
+    FROM listing l
+    JOIN book b ON l.book_id = b.book_id
+    JOIN `user` u ON l.seller_id = u.user_id
+    <span class="hljs-tag">&lt;<span class="hljs-name">include</span> <span class="hljs-attr">refid</span>=<span class="hljs-string">"filterConditions"</span>/&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">choose</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">when</span> <span class="hljs-attr">test</span>=<span class="hljs-string">"sortBy == 'price_asc'"</span>&gt;</span>ORDER BY l.price ASC<span class="hljs-tag">&lt;/<span class="hljs-name">when</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">when</span> <span class="hljs-attr">test</span>=<span class="hljs-string">"sortBy == 'price_desc'"</span>&gt;</span>ORDER BY l.price DESC<span class="hljs-tag">&lt;/<span class="hljs-name">when</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">otherwise</span>&gt;</span>ORDER BY l.post_time DESC<span class="hljs-tag">&lt;/<span class="hljs-name">otherwise</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">choose</span>&gt;</span>
+    LIMIT #{pageSize} OFFSET ${(page - 1) * pageSize}
+<span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span>
+</div></code></pre>
+<p><strong>执行结果</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// 请求</span>
+GET /listings?keyword=数据库&amp;categoryId=<span class="hljs-number">1</span>&amp;sortBy=price_asc&amp;page=<span class="hljs-number">1</span>&amp;pageSize=<span class="hljs-number">10</span>
+
+<span class="hljs-comment">// 响应</span>
+{
+  <span class="hljs-attr">"code"</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-attr">"msg"</span>: <span class="hljs-string">"success"</span>,
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"total"</span>: <span class="hljs-number">5</span>,
+    <span class="hljs-attr">"page"</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-attr">"pageSize"</span>: <span class="hljs-number">10</span>,
+    <span class="hljs-attr">"items"</span>: [
+      {
+        <span class="hljs-attr">"listingId"</span>: <span class="hljs-number">1</span>,
+        <span class="hljs-attr">"title"</span>: <span class="hljs-string">"数据库系统概念"</span>,
+        <span class="hljs-attr">"author"</span>: <span class="hljs-string">"Abraham Silberschatz"</span>,
+        <span class="hljs-attr">"price"</span>: <span class="hljs-number">35.50</span>,
+        <span class="hljs-attr">"listingType"</span>: <span class="hljs-string">"出售"</span>,
+        <span class="hljs-attr">"status"</span>: <span class="hljs-string">"在售"</span>,
+        <span class="hljs-attr">"coverImageUrl"</span>: <span class="hljs-string">"https://oss.example.com/db.jpg"</span>,
+        <span class="hljs-attr">"sellerNickname"</span>: <span class="hljs-string">"学霸"</span>
+      }
+    ]
+  }
+}
+</div></code></pre>
+<h4 id="22-%E5%8F%91%E5%B8%83%E6%96%B0%E4%B9%A6%E7%B1%8D">2.2 发布新书籍</h4>
+<p><strong>实现方式</strong>：事务处理，先检查/创建 Book，再创建 Listing</p>
+<p><strong>Java Service 代码</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-meta">@Override</span>
+<span class="hljs-meta">@Transactional</span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> Integer <span class="hljs-title">create</span><span class="hljs-params">(ListingCreateDTO dto)</span> </span>{
+    Integer currentUserId = BaseContext.getCurrentId();
+    
+    <span class="hljs-comment">// 1. 检查书籍是否存在，不存在则创建</span>
+    Book book = bookMapper.findByIsbn(dto.getIsbn());
+    <span class="hljs-keyword">if</span> (book == <span class="hljs-keyword">null</span>) {
+        book = <span class="hljs-keyword">new</span> Book();
+        book.setIsbn(dto.getIsbn());
+        book.setTitle(dto.getTitle());
+        book.setAuthor(dto.getAuthor());
+        book.setPublisher(dto.getPublisher());
+        book.setPublicationYear(dto.getPublicationYear());
+        book.setCoverImageUrl(dto.getCoverImageUrl());
+        bookMapper.insert(book);
+    }
+    
+    <span class="hljs-comment">// 2. 创建发布信息</span>
+    Listing listing = <span class="hljs-keyword">new</span> Listing();
+    listing.setSellerId(currentUserId);
+    listing.setBookId(book.getBookId());
+    listing.setPrice(dto.getPrice());
+    listing.setConditionDesc(dto.getCondition());
+    listing.setListingType(dto.getListingType());
+    listing.setDescription(dto.getDescription());
+    
+    bookAndListingMapper.insert(listing);
+    
+    <span class="hljs-comment">// 3. 关联书籍分类</span>
+    <span class="hljs-keyword">if</span> (dto.getCategoryId() != <span class="hljs-keyword">null</span>) {
+        bookCategoryMapper.insertBookCategory(book.getBookId(), dto.getCategoryId());
+    }
+    
+    <span class="hljs-keyword">return</span> listing.getListingId();
+}
+</div></code></pre>
+<p><strong>执行结果</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// 请求</span>
+POST /listings
+{
+  <span class="hljs-attr">"isbn"</span>: <span class="hljs-string">"9787111216719"</span>,
+  <span class="hljs-attr">"title"</span>: <span class="hljs-string">"数据库系统概念"</span>,
+  <span class="hljs-attr">"author"</span>: <span class="hljs-string">"Abraham Silberschatz"</span>,
+  <span class="hljs-attr">"price"</span>: <span class="hljs-number">35.50</span>,
+  <span class="hljs-attr">"condition"</span>: <span class="hljs-string">"九成新"</span>,
+  <span class="hljs-attr">"listingType"</span>: <span class="hljs-string">"出售"</span>,
+  <span class="hljs-attr">"categoryId"</span>: <span class="hljs-number">1</span>
+}
+
+<span class="hljs-comment">// 响应</span>
+{
+  <span class="hljs-attr">"code"</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-attr">"msg"</span>: <span class="hljs-string">"success"</span>,
+  <span class="hljs-attr">"data"</span>: { <span class="hljs-attr">"listingId"</span>: <span class="hljs-number">1</span> }
+}
+</div></code></pre>
+<hr>
+<h3 id="3-%E8%AE%A2%E5%8D%95%E6%A8%A1%E5%9D%97">3. 订单模块</h3>
+<h4 id="31-%E5%88%9B%E5%BB%BA%E8%AE%A2%E5%8D%95%E8%A7%A6%E5%8F%91%E5%99%A8%E8%87%AA%E5%8A%A8%E6%9B%B4%E6%96%B0%E4%B9%A6%E7%B1%8D%E7%8A%B6%E6%80%81">3.1 创建订单（触发器自动更新书籍状态）</h4>
+<p><strong>触发器定义</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TRIGGER</span> after_order_insert
+<span class="hljs-keyword">AFTER</span> <span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">ON</span> <span class="hljs-string">`orders`</span>
+<span class="hljs-keyword">FOR</span> <span class="hljs-keyword">EACH</span> <span class="hljs-keyword">ROW</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">UPDATE</span> <span class="hljs-string">`listing`</span>
+    <span class="hljs-keyword">SET</span> <span class="hljs-string">`status`</span> = <span class="hljs-string">'已预定'</span>
+    <span class="hljs-keyword">WHERE</span> listing_id = NEW.listing_id;
+<span class="hljs-keyword">END</span>$$
+</div></code></pre>
+<p><strong>Java Service 代码</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-meta">@Override</span>
+<span class="hljs-meta">@Transactional</span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> Integer <span class="hljs-title">createOrder</span><span class="hljs-params">(OrderCreateDTO dto)</span> </span>{
+    Integer currentUserId = BaseContext.getCurrentId();
+    
+    <span class="hljs-comment">// 检查书籍是否在售</span>
+    Listing listing = bookAndListingMapper.findById(dto.getListingId());
+    <span class="hljs-keyword">if</span> (listing == <span class="hljs-keyword">null</span>) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ResourceNotFoundException(<span class="hljs-string">"书籍不存在"</span>);
+    }
+    <span class="hljs-keyword">if</span> (!<span class="hljs-string">"在售"</span>.equals(listing.getStatus())) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> BusinessException(<span class="hljs-string">"该书籍已被预定或已售出"</span>);
+    }
+    <span class="hljs-keyword">if</span> (listing.getSellerId().equals(currentUserId)) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> BusinessException(<span class="hljs-string">"不能购买自己发布的书籍"</span>);
+    }
+    
+    <span class="hljs-comment">// 创建订单（触发器会自动更新 listing 状态为"已预定"）</span>
+    Order order = <span class="hljs-keyword">new</span> Order();
+    order.setListingId(dto.getListingId());
+    order.setBuyerId(currentUserId);
+    order.setTransactionPrice(listing.getPrice());
+    
+    orderMapper.insert(order);
+    <span class="hljs-keyword">return</span> order.getOrderId();
+}
+</div></code></pre>
+<p><strong>执行结果</strong>：</p>
+<pre class="hljs"><code><div>1. 订单创建成功，order_id = 1
+2. 触发器自动执行，listing.status 从 '在售' 变为 '已预定'
+</div></code></pre>
+<h4 id="32-%E7%A1%AE%E8%AE%A4%E4%BA%A4%E6%98%93%E5%AE%8C%E6%88%90%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B--%E8%A7%A6%E5%8F%91%E5%99%A8">3.2 确认交易完成（存储过程 + 触发器）</h4>
+<p><strong>存储过程定义</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">PROCEDURE</span> complete_transaction(
+    <span class="hljs-keyword">IN</span> p_order_id <span class="hljs-built_in">INT</span>,
+    <span class="hljs-keyword">OUT</span> p_result_code <span class="hljs-built_in">INT</span>,
+    <span class="hljs-keyword">OUT</span> p_result_message <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">255</span>)
+)
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">DECLARE</span> current_order_status <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">50</span>) <span class="hljs-keyword">DEFAULT</span> <span class="hljs-literal">NULL</span>;
+    <span class="hljs-keyword">DECLARE</span> target_listing_id <span class="hljs-built_in">INT</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-literal">NULL</span>;
+
+    <span class="hljs-keyword">DECLARE</span> <span class="hljs-keyword">EXIT</span> <span class="hljs-keyword">HANDLER</span> <span class="hljs-keyword">FOR</span> SQLEXCEPTION
+    <span class="hljs-keyword">BEGIN</span>
+        <span class="hljs-keyword">ROLLBACK</span>;
+        <span class="hljs-keyword">SET</span> p_result_code = <span class="hljs-number">2</span>;
+        <span class="hljs-keyword">SET</span> p_result_message = <span class="hljs-string">'操作失败：发生未知数据库错误。'</span>;
+    <span class="hljs-keyword">END</span>;
+
+    <span class="hljs-comment">-- 查询订单信息</span>
+    <span class="hljs-keyword">SELECT</span> order_status, listing_id 
+    <span class="hljs-keyword">INTO</span> current_order_status, target_listing_id
+    <span class="hljs-keyword">FROM</span> <span class="hljs-string">`orders`</span> 
+    <span class="hljs-keyword">WHERE</span> order_id = p_order_id
+    <span class="hljs-keyword">LIMIT</span> <span class="hljs-number">1</span>;
+
+    IF current_order_status IS NULL THEN
+        <span class="hljs-keyword">SET</span> p_result_code = <span class="hljs-number">1</span>;
+        <span class="hljs-keyword">SET</span> p_result_message = <span class="hljs-string">'操作失败：订单不存在。'</span>;
+    ELSEIF current_order_status != '待确认' THEN
+        <span class="hljs-keyword">SET</span> p_result_code = <span class="hljs-number">1</span>;
+        <span class="hljs-keyword">SET</span> p_result_message = <span class="hljs-keyword">CONCAT</span>(<span class="hljs-string">'操作失败：订单当前状态为 "'</span>, current_order_status, <span class="hljs-string">'"，无法完成。'</span>);
+    ELSE
+        <span class="hljs-keyword">START</span> <span class="hljs-keyword">TRANSACTION</span>;
+
+        <span class="hljs-comment">-- 1. 更新订单状态为"已完成"</span>
+        <span class="hljs-keyword">UPDATE</span> <span class="hljs-string">`orders`</span> <span class="hljs-keyword">SET</span> order_status = <span class="hljs-string">'已完成'</span> <span class="hljs-keyword">WHERE</span> order_id = p_order_id;
+
+        <span class="hljs-comment">-- 2. 更新发布信息状态为"已售出"</span>
+        <span class="hljs-keyword">UPDATE</span> <span class="hljs-string">`listing`</span> <span class="hljs-keyword">SET</span> <span class="hljs-string">`status`</span> = <span class="hljs-string">'已售出'</span> <span class="hljs-keyword">WHERE</span> listing_id = target_listing_id;
+        
+        <span class="hljs-comment">-- 3. 信誉分更新由触发器自动完成</span>
+
+        <span class="hljs-keyword">COMMIT</span>;
+        <span class="hljs-keyword">SET</span> p_result_code = <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">SET</span> p_result_message = <span class="hljs-string">'交易成功完成！'</span>;
+    <span class="hljs-keyword">END</span> <span class="hljs-keyword">IF</span>;
+<span class="hljs-keyword">END</span>$$
+</div></code></pre>
+<p><strong>触发器定义（自动增加信誉分）</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TRIGGER</span> after_order_update_complete
+<span class="hljs-keyword">AFTER</span> <span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">ON</span> <span class="hljs-string">`orders`</span>
+<span class="hljs-keyword">FOR</span> <span class="hljs-keyword">EACH</span> <span class="hljs-keyword">ROW</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">DECLARE</span> seller_user_id <span class="hljs-built_in">INT</span>;
+
+    IF OLD.order_status != '已完成' AND NEW.order_status = '已完成' THEN
+        <span class="hljs-comment">-- 获取卖家ID</span>
+        <span class="hljs-keyword">SELECT</span> seller_id <span class="hljs-keyword">INTO</span> seller_user_id 
+        <span class="hljs-keyword">FROM</span> <span class="hljs-string">`listing`</span> <span class="hljs-keyword">WHERE</span> listing_id = NEW.listing_id;
+
+        <span class="hljs-comment">-- 给买家增加信誉分（+5分）</span>
+        <span class="hljs-keyword">UPDATE</span> <span class="hljs-string">`user`</span> <span class="hljs-keyword">SET</span> credit_score = credit_score + <span class="hljs-number">5</span> <span class="hljs-keyword">WHERE</span> user_id = NEW.buyer_id;
+
+        <span class="hljs-comment">-- 给卖家增加信誉分（+5分）</span>
+        <span class="hljs-keyword">UPDATE</span> <span class="hljs-string">`user`</span> <span class="hljs-keyword">SET</span> credit_score = credit_score + <span class="hljs-number">5</span> <span class="hljs-keyword">WHERE</span> user_id = seller_user_id;
+    <span class="hljs-keyword">END</span> <span class="hljs-keyword">IF</span>;
+<span class="hljs-keyword">END</span>$$
+</div></code></pre>
+<p><strong>MyBatis 调用存储过程</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"completeTransaction"</span> <span class="hljs-attr">statementType</span>=<span class="hljs-string">"CALLABLE"</span> <span class="hljs-attr">parameterType</span>=<span class="hljs-string">"map"</span>&gt;</span>
+    {CALL complete_transaction(
+        #{orderId, mode=IN, jdbcType=INTEGER},
+        #{resultCode, mode=OUT, jdbcType=INTEGER},
+        #{resultMessage, mode=OUT, jdbcType=VARCHAR}
+    )}
+<span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span>
+</div></code></pre>
+<p><strong>执行结果</strong>：</p>
+<pre class="hljs"><code><div>1. 存储过程执行：订单状态从 '待确认' 变为 '已完成'
+2. 存储过程执行：书籍状态从 '已预定' 变为 '已售出'
+3. 触发器自动执行：买家信誉分 +5
+4. 触发器自动执行：卖家信誉分 +5
+</div></code></pre>
+<h4 id="33-%E5%8F%96%E6%B6%88%E8%AE%A2%E5%8D%95%E8%A7%A6%E5%8F%91%E5%99%A8%E8%87%AA%E5%8A%A8%E6%81%A2%E5%A4%8D%E4%B9%A6%E7%B1%8D%E7%8A%B6%E6%80%81">3.3 取消订单（触发器自动恢复书籍状态）</h4>
+<p><strong>触发器定义</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TRIGGER</span> after_order_update_cancel
+<span class="hljs-keyword">AFTER</span> <span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">ON</span> <span class="hljs-string">`orders`</span>
+<span class="hljs-keyword">FOR</span> <span class="hljs-keyword">EACH</span> <span class="hljs-keyword">ROW</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">IF</span> NEW.order_status = <span class="hljs-string">'已取消'</span> <span class="hljs-keyword">THEN</span>
+        <span class="hljs-keyword">UPDATE</span> <span class="hljs-string">`listing`</span>
+        <span class="hljs-keyword">SET</span> <span class="hljs-string">`status`</span> = <span class="hljs-string">'在售'</span>
+        <span class="hljs-keyword">WHERE</span> listing_id = NEW.listing_id;
+    <span class="hljs-keyword">END</span> <span class="hljs-keyword">IF</span>;
+<span class="hljs-keyword">END</span>$$
+</div></code></pre>
+<p><strong>执行结果</strong>：</p>
+<pre class="hljs"><code><div>1. 订单状态更新为 '已取消'
+2. 触发器自动执行，listing.status 从 '已预定' 恢复为 '在售'
+</div></code></pre>
+<hr>
+<h3 id="4-%E5%88%86%E7%B1%BB%E6%A8%A1%E5%9D%97">4. 分类模块</h3>
+<h4 id="41-%E8%8E%B7%E5%8F%96%E6%89%80%E6%9C%89%E5%88%86%E7%B1%BB">4.1 获取所有分类</h4>
+<p><strong>MyBatis Mapper</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"findAllCategories"</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">"com.tiancai.entity.Category"</span>&gt;</span>
+    SELECT category_id AS categoryId, category_name AS categoryName
+    FROM category
+    ORDER BY category_id
+<span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span>
+</div></code></pre>
+<p><strong>执行结果</strong>：</p>
+<pre class="hljs"><code><div>{
+  <span class="hljs-attr">"code"</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-attr">"msg"</span>: <span class="hljs-string">"success"</span>,
+  <span class="hljs-attr">"data"</span>: [
+    { <span class="hljs-attr">"categoryId"</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">"categoryName"</span>: <span class="hljs-string">"计算机"</span> },
+    { <span class="hljs-attr">"categoryId"</span>: <span class="hljs-number">2</span>, <span class="hljs-attr">"categoryName"</span>: <span class="hljs-string">"文学小说"</span> },
+    { <span class="hljs-attr">"categoryId"</span>: <span class="hljs-number">3</span>, <span class="hljs-attr">"categoryName"</span>: <span class="hljs-string">"外语学习"</span> },
+    { <span class="hljs-attr">"categoryId"</span>: <span class="hljs-number">4</span>, <span class="hljs-attr">"categoryName"</span>: <span class="hljs-string">"考研考公"</span> },
+    { <span class="hljs-attr">"categoryId"</span>: <span class="hljs-number">5</span>, <span class="hljs-attr">"categoryName"</span>: <span class="hljs-string">"理工科"</span> }
+  ]
+}
+</div></code></pre>
+<hr>
+<h3 id="5-ai%E6%99%BA%E8%83%BD%E5%AE%A2%E6%9C%8D%E6%A8%A1%E5%9D%97">5. AI智能客服模块</h3>
+<h4 id="51-ai%E6%99%BA%E8%83%BD%E5%AE%A2%E6%9C%8D%E5%AF%B9%E8%AF%9D">5.1 AI智能客服对话</h4>
+<p><strong>实现方式</strong>：意图识别 + 路由处理（RAG问答/智能搜索/智能导航/闲聊）</p>
+<p><strong>Java Service 代码</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-meta">@Service</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AiAssistantService</span> </span>{
+    <span class="hljs-meta">@Autowired</span>
+    <span class="hljs-keyword">private</span> DeepSeekClient deepSeekClient;
+    <span class="hljs-meta">@Autowired</span>
+    <span class="hljs-keyword">private</span> RagService ragService;
+    <span class="hljs-meta">@Autowired</span>
+    <span class="hljs-keyword">private</span> NavigationService navigationService;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AssistantResponse <span class="hljs-title">chat</span><span class="hljs-params">(String userMessage)</span> </span>{
+        <span class="hljs-comment">// 1. 意图识别（分类为FAQ/SEARCH/NAVIGATE/CHAT）</span>
+        String intent = classifyIntent(userMessage);
+        
+        <span class="hljs-comment">// 2. 根据意图路由到不同处理模块</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">switch</span> (intent) {
+            <span class="hljs-keyword">case</span> <span class="hljs-string">"FAQ"</span> -&gt; handleFaq(userMessage);      <span class="hljs-comment">// RAG问答</span>
+            <span class="hljs-keyword">case</span> <span class="hljs-string">"SEARCH"</span> -&gt; handleSearch(userMessage); <span class="hljs-comment">// 智能搜索</span>
+            <span class="hljs-keyword">case</span> <span class="hljs-string">"NAVIGATE"</span> -&gt; handleNavigate(userMessage); <span class="hljs-comment">// 智能导航</span>
+            <span class="hljs-keyword">default</span> -&gt; handleChat(userMessage);         <span class="hljs-comment">// 闲聊</span>
+        };
+    }
+}
+</div></code></pre>
+<p><strong>执行结果</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// 请求</span>
+POST /ai/chat
+{
+  <span class="hljs-attr">"message"</span>: <span class="hljs-string">"怎么发布书籍？"</span>
+}
+
+<span class="hljs-comment">// 响应</span>
+{
+  <span class="hljs-attr">"code"</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-attr">"msg"</span>: <span class="hljs-string">"success"</span>,
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"type"</span>: <span class="hljs-string">"faq"</span>,
+    <span class="hljs-attr">"message"</span>: <span class="hljs-string">"发布书籍的步骤如下：\n1. 登录后点击【发布书籍】\n2. 填写书籍信息（ISBN、书名、作者）..."</span>,
+    <span class="hljs-attr">"navigation"</span>: <span class="hljs-literal">null</span>
+  }
+}
+</div></code></pre>
+<h4 id="52-rag%E9%97%AE%E7%AD%94%E5%AE%9E%E7%8E%B0">5.2 RAG问答实现</h4>
+<p><strong>实现方式</strong>：文档检索 + DeepSeek生成回答</p>
+<p><strong>Java Service 代码</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-meta">@Service</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RagService</span> </span>{
+    <span class="hljs-meta">@PostConstruct</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">loadDocuments</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-comment">// 加载使用指南文档，切分为文档块</span>
+        loadDocument(<span class="hljs-string">"docs/使用指南.md"</span>, <span class="hljs-string">"使用指南"</span>);
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">answer</span><span class="hljs-params">(String question)</span> </span>{
+        <span class="hljs-comment">// 1. 检索相关文档块（基于关键词匹配）</span>
+        List&lt;DocumentChunk&gt; relevantDocs = retrieveRelevant(question, <span class="hljs-number">3</span>);
+        
+        <span class="hljs-comment">// 2. 构建上下文</span>
+        String context = relevantDocs.stream()
+            .map(doc -&gt; doc.content)
+            .collect(Collectors.joining(<span class="hljs-string">"\n\n---\n\n"</span>));
+        
+        <span class="hljs-comment">// 3. 调用DeepSeek生成回答</span>
+        String systemPrompt = String.format(SYSTEM_PROMPT, context);
+        <span class="hljs-keyword">return</span> deepSeekClient.chat(systemPrompt, question);
+    }
+}
+</div></code></pre>
+<h4 id="53-%E6%99%BA%E8%83%BD%E6%90%9C%E7%B4%A2%E5%AE%9E%E7%8E%B0">5.3 智能搜索实现</h4>
+<p><strong>实现方式</strong>：DeepSeek分析 + 分类匹配</p>
+<p><strong>Java Service 代码</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-meta">@Service</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">NavigationService</span> </span>{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> NavigationResult <span class="hljs-title">searchBooks</span><span class="hljs-params">(String userQuery)</span> </span>{
+        <span class="hljs-comment">// 1. 获取所有分类</span>
+        List&lt;Category&gt; categories = categoryMapper.findAll();
+        
+        <span class="hljs-comment">// 2. 使用DeepSeek判断是否为分类搜索</span>
+        String analysis = deepSeekClient.chat(CATEGORY_ANALYSIS_PROMPT, userQuery);
+        
+        <span class="hljs-comment">// 3. 匹配分类或提取关键词</span>
+        <span class="hljs-keyword">if</span> (匹配到分类) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> NavigationResult(<span class="hljs-string">"listings"</span>, 
+                Map.of(<span class="hljs-string">"categoryId"</span>, categoryId), <span class="hljs-string">"跳转到分类筛选"</span>);
+        } <span class="hljs-keyword">else</span> {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> NavigationResult(<span class="hljs-string">"listings"</span>, 
+                Map.of(<span class="hljs-string">"keyword"</span>, keyword), <span class="hljs-string">"跳转到关键词搜索"</span>);
+        }
+    }
+}
+</div></code></pre>
+<hr>
+<h3 id="6-text-to-sql%E6%95%B0%E6%8D%AE%E6%9F%A5%E8%AF%A2%E6%A8%A1%E5%9D%97">6. Text-to-SQL数据查询模块</h3>
+<h4 id="61-%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E8%BD%ACsql%E6%9F%A5%E8%AF%A2">6.1 自然语言转SQL查询</h4>
+<p><strong>实现方式</strong>：DeepSeek生成SQL + 安全检查 + 执行查询</p>
+<p><strong>Java Service 代码</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-meta">@Service</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AdminTextToSqlService</span> </span>{
+    <span class="hljs-meta">@Autowired</span>
+    <span class="hljs-keyword">private</span> DeepSeekClient deepSeekClient;
+    <span class="hljs-meta">@Autowired</span>
+    <span class="hljs-keyword">private</span> JdbcTemplate jdbcTemplate;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> QueryResult <span class="hljs-title">queryByNaturalLanguage</span><span class="hljs-params">(String userQuery)</span> </span>{
+        <span class="hljs-comment">// 1. 生成SQL</span>
+        String sql = generateSql(userQuery);
+        
+        <span class="hljs-comment">// 2. 安全检查（仅允许SELECT）</span>
+        <span class="hljs-keyword">if</span> (!isSafeQuery(sql)) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> QueryResult(<span class="hljs-keyword">false</span>, <span class="hljs-string">"查询请求不安全，已被拒绝"</span>, <span class="hljs-keyword">null</span>, <span class="hljs-keyword">null</span>);
+        }
+        
+        <span class="hljs-comment">// 3. 执行查询</span>
+        List&lt;Map&lt;String, Object&gt;&gt; results = jdbcTemplate.queryForList(sql);
+        
+        <span class="hljs-comment">// 4. 生成友好回复</span>
+        String friendlyAnswer = generateFriendlyAnswer(userQuery, results);
+        
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> QueryResult(<span class="hljs-keyword">true</span>, friendlyAnswer, results, sql);
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">isSafeQuery</span><span class="hljs-params">(String sql)</span> </span>{
+        <span class="hljs-comment">// 必须是以SELECT开头</span>
+        <span class="hljs-keyword">if</span> (!sql.toUpperCase().trim().startsWith(<span class="hljs-string">"SELECT"</span>)) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+        }
+        <span class="hljs-comment">// 禁止危险操作</span>
+        String[] forbidden = {<span class="hljs-string">"DROP"</span>, <span class="hljs-string">"DELETE"</span>, <span class="hljs-string">"UPDATE"</span>, <span class="hljs-string">"INSERT"</span>, <span class="hljs-string">"TRUNCATE"</span>, <span class="hljs-string">"ALTER"</span>};
+        <span class="hljs-keyword">for</span> (String kw : forbidden) {
+            <span class="hljs-keyword">if</span> (sql.toUpperCase().contains(kw)) {
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+            }
+        }
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+    }
+}
+</div></code></pre>
+<p><strong>执行结果</strong>：</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// 请求</span>
+POST /admin/text-to-sql/query
+{
+  <span class="hljs-attr">"query"</span>: <span class="hljs-string">"本月新增用户数"</span>
+}
+
+<span class="hljs-comment">// 响应</span>
+{
+  <span class="hljs-attr">"code"</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-attr">"msg"</span>: <span class="hljs-string">"success"</span>,
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"success"</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">"message"</span>: <span class="hljs-string">"查询结果：15"</span>,
+    <span class="hljs-attr">"data"</span>: [
+      {
+        <span class="hljs-attr">"count"</span>: <span class="hljs-number">15</span>
+      }
+    ],
+    <span class="hljs-attr">"sql"</span>: <span class="hljs-string">"SELECT COUNT(*) as count FROM user WHERE YEAR(register_time) = YEAR(NOW()) AND MONTH(register_time) = MONTH(NOW()) LIMIT 100"</span>
+  }
+}
+</div></code></pre>
+<h4 id="62-sql%E7%94%9F%E6%88%90%E6%8F%90%E7%A4%BA%E8%AF%8D%E8%AE%BE%E8%AE%A1">6.2 SQL生成提示词设计</h4>
+<p><strong>提示词要点</strong>：</p>
+<ul>
+<li>提供完整的数据库表结构信息</li>
+<li>明确只允许生成SELECT语句</li>
+<li>自动添加LIMIT 100限制</li>
+<li>支持聚合函数、日期函数、GROUP BY等</li>
+</ul>
+<hr>
+<h3 id="7-%E6%95%B0%E6%8D%AE%E5%BA%93%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93">7. 数据库高级特性使用总结</h3>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>使用场景</th>
+<th>具体实现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>触发器</strong></td>
+<td>创建订单后自动更新书籍状态</td>
+<td><code>after_order_insert</code></td>
+</tr>
+<tr>
+<td><strong>触发器</strong></td>
+<td>交易完成后自动增加信誉分</td>
+<td><code>after_order_update_complete</code></td>
+</tr>
+<tr>
+<td><strong>触发器</strong></td>
+<td>取消订单后自动恢复书籍状态</td>
+<td><code>after_order_update_cancel</code></td>
+</tr>
+<tr>
+<td><strong>存储过程</strong></td>
+<td>完成交易的原子操作</td>
+<td><code>complete_transaction</code></td>
+</tr>
+<tr>
+<td><strong>事务</strong></td>
+<td>发布书籍（Book + Listing + Category 关联）</td>
+<td>Spring <code>@Transactional</code></td>
+</tr>
+<tr>
+<td><strong>外键约束</strong></td>
+<td>保证数据参照完整性</td>
+<td>所有关联表</td>
+</tr>
+<tr>
+<td><strong>唯一索引</strong></td>
+<td>防止重复数据</td>
+<td><code>student_id</code>, <code>isbn</code>, <code>category_name</code></td>
+</tr>
+<tr>
+<td><strong>AI大模型</strong></td>
+<td>智能客服意图识别和问答</td>
+<td>DeepSeek API</td>
+</tr>
+<tr>
+<td><strong>RAG技术</strong></td>
+<td>基于文档的智能问答</td>
+<td>文档检索 + DeepSeek生成</td>
+</tr>
+<tr>
+<td><strong>Text-to-SQL</strong></td>
+<td>自然语言转SQL查询</td>
+<td>DeepSeek + SQL安全检查</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="%E4%B8%89%E7%BB%84%E5%91%98%E5%A4%A7%E4%BD%9C%E4%B8%9A%E6%80%BB%E7%BB%93">三、组员大作业总结</h2>
+<h3 id="%E5%90%8C%E5%AD%A61">同学1：</h3>
+<p><strong>任务内容概述</strong>：
+负责系统功能设计与用户模块、订单模块的数据库操作实现。主要工作包括：</p>
+<ol>
+<li>系统整体功能模块划分和 API 接口设计</li>
+<li>用户注册、登录、信息管理功能的实现</li>
+<li>订单创建、查询、确认、取消功能的实现</li>
+<li>编写触发器和存储过程实现业务逻辑自动化</li>
+</ol>
+<p><strong>任务难点及解决方法</strong>：</p>
+<ol>
+<li>
+<p><strong>难点</strong>：订单状态变更需要联动更新书籍状态和用户信誉分</p>
+<ul>
+<li><strong>解决</strong>：使用触发器（Trigger）实现自动化联动，当订单状态变更时自动触发相关更新操作</li>
+</ul>
+</li>
+<li>
+<p><strong>难点</strong>：交易完成需要保证原子性</p>
+<ul>
+<li><strong>解决</strong>：使用存储过程（Stored Procedure）封装事务，确保订单更新和书籍状态更新在同一事务中完成</li>
+</ul>
+</li>
+<li>
+<p><strong>难点</strong>：用户认证和权限控制</p>
+<ul>
+<li><strong>解决</strong>：使用 JWT Token 实现无状态认证，通过拦截器统一验证用户身份</li>
+</ul>
+</li>
+</ol>
+<p><strong>任务完成结果</strong>：</p>
+<ul>
+<li>成功实现用户模块的全部功能（注册、登录、信息查询和修改）</li>
+<li>成功实现订单模块的全部功能（下单、查询、确认、取消）</li>
+<li>成功编写 3 个触发器和 1 个存储过程</li>
+<li>所有 API 接口测试通过</li>
+</ul>
+<p><strong>收获与体会</strong>：
+通过本次大作业，深入理解了数据库触发器和存储过程的实际应用场景。触发器可以实现业务逻辑的自动化，减少应用层代码的复杂度；存储过程可以封装复杂的事务操作，保证数据一致性。同时也掌握了 Spring Boot + MyBatis 框架的开发流程，对前后端分离架构有了更深入的理解。</p>
+<hr>
+<h3 id="%E5%90%8C%E5%AD%A62">同学2：</h3>
+<p><strong>任务内容概述</strong>：
+负责系统数据库设计与书籍发布模块的数据库操作实现。主要工作包括：</p>
+<ol>
+<li>数据库概念模式设计（E-R 图）</li>
+<li>数据库逻辑模式设计（关系模式定义和范式分析）</li>
+<li>数据库物理设计（索引设计）</li>
+<li>书籍搜索、详情查看、发布、下架功能的实现</li>
+</ol>
+<p><strong>任务难点及解决方法</strong>：</p>
+<ol>
+<li>
+<p><strong>难点</strong>：书籍搜索需要支持多条件组合查询</p>
+<ul>
+<li><strong>解决</strong>：使用 MyBatis 动态 SQL（<code>&lt;if&gt;</code>, <code>&lt;where&gt;</code>, <code>&lt;choose&gt;</code>）实现灵活的条件组合</li>
+</ul>
+</li>
+<li>
+<p><strong>难点</strong>：书籍与分类是多对多关系，查询时需要高效关联</p>
+<ul>
+<li><strong>解决</strong>：使用中间表 <code>book_category</code> 实现多对多关联，并通过子查询优化分类筛选</li>
+</ul>
+</li>
+<li>
+<p><strong>难点</strong>：发布书籍时需要处理书籍去重（同一 ISBN 的书不重复创建）</p>
+<ul>
+<li><strong>解决</strong>：先根据 ISBN 查询，存在则复用，不存在则新建，使用事务保证原子性</li>
+</ul>
+</li>
+</ol>
+<p><strong>任务完成结果</strong>：</p>
+<ul>
+<li>完成了完整的数据库设计文档（E-R 图、关系模式、范式分析）</li>
+<li>成功创建 7 张数据库表，包含主键、外键、索引约束</li>
+<li>成功实现书籍搜索、详情、发布、下架功能</li>
+<li>支持关键词搜索、分类筛选、价格排序、分页查询</li>
+</ul>
+<p><strong>收获与体会</strong>：
+通过本次大作业，系统地学习了数据库设计的完整流程：从需求分析到概念设计，再到逻辑设计和物理设计。深刻理解了范式化设计的重要性，以及如何在规范化和查询效率之间做权衡。同时掌握了 MyBatis 动态 SQL 的编写技巧，能够实现复杂的多条件查询。前端 Vue.js + Element Plus 的开发也让我对全栈开发有了更全面的认识。</p>
+<hr>
+<h2 id="%E9%99%84%E5%BD%95%E9%A1%B9%E7%9B%AE%E6%8A%80%E6%9C%AF%E6%A0%88">附录：项目技术栈</h2>
+<table>
+<thead>
+<tr>
+<th>层次</th>
+<th>技术</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>前端</td>
+<td>Vue 3 + Element Plus + Vite + Pinia + Axios</td>
+</tr>
+<tr>
+<td>后端</td>
+<td>Spring Boot 3 + MyBatis + JWT</td>
+</tr>
+<tr>
+<td>数据库</td>
+<td>MySQL 8 (InnoDB)</td>
+</tr>
+<tr>
+<td>对象存储</td>
+<td>阿里云 OSS</td>
+</tr>
+<tr>
+<td>AI服务</td>
+<td>DeepSeek API (大语言模型)</td>
+</tr>
+<tr>
+<td>开发工具</td>
+<td>IntelliJ IDEA, VS Code, Navicat</td>
+</tr>
+</tbody>
+</table>
+
+</body>
+</html>

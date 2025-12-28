@@ -2,7 +2,7 @@
 
 ---
 
-### **校园二手书交易与分享平台 - API 接口文档 (V1.0)**
+### **校园二手书交易与分享平台 - C端（用户端）API 接口文档 (V1.0)**
 
 #### **1. 项目概述**
 
@@ -254,7 +254,7 @@
 *   **Endpoint**: `DELETE /listings/{id}`
 *   **认证**: **需要**
 *   **路径参数 (Path Variable)**: `id` (Integer, 必填): 发布的 `listingId`。
-*   **后端逻辑**: 逻辑删除，将`listing`表的`status`字段更新为“已下架”。
+*   **后端逻辑**: 逻辑删除，将`listing`表的`status`字段更新为"已下架"。
 *   **成功响应 (200 OK)**:
     ```json
     { "code": 1, "msg": "success", "data": "下架成功" }
@@ -277,7 +277,7 @@
       "listingId": 1 // Integer, 必填, 想要购买的书籍发布ID
     }
     ```
-*   **后端逻辑**: 创建订单记录，并由`after_order_insert`触发器自动将书籍状态更新为“已预定”。
+*   **后端逻辑**: 创建订单记录，并由`after_order_insert`触发器自动将书籍状态更新为"已预定"。
 *   **成功响应 (201 Created)**:
     ```json
     {
@@ -286,7 +286,7 @@
       "data": { "orderId": 501 }
     }
     ```
-*   **失败响应**: `400 Bad Request`: 书籍状态不是“在售”（如已被预定或售出）。
+*   **失败响应**: `400 Bad Request`: 书籍状态不是"在售"（如已被预定或售出）。
 
 #### **3.2 获取我的订单列表**
 *   **功能**: 查看自己作为买家或卖家的所有订单。
@@ -329,7 +329,7 @@
 *   **Endpoint**: `PUT /orders/{id}/cancel`
 *   **认证**: **需要**
 *   **路径参数 (Path Variable)**: `id` (Integer, 必填): 订单 `orderId`。
-*   **后端逻辑**: 更新订单状态为“已取消”。触发器将自动恢复书籍为“在售”状态。
+*   **后端逻辑**: 更新订单状态为"已取消"。触发器将自动恢复书籍为"在售"状态。
 *   **成功响应 (200 OK)**:
     ```json
     { "code": 1, "msg": "success", "data": "订单已取消" }
@@ -338,7 +338,7 @@
 
 ---
 
-### **模块四：其他模块**
+### **模块四：分类模块 (Category Module)**
 
 #### **4.1 获取所有书籍分类**
 *   **功能**: 用于前端展示分类筛选列表。
@@ -356,3 +356,88 @@
       ]
     }
     ```
+
+---
+
+### **模块五：文件上传模块 (Upload Module)**
+
+#### **5.1 上传文件**
+*   **功能**: 通用文件上传接口，用于上传图片等文件到阿里云OSS。
+*   **Endpoint**: `POST /upload`
+*   **认证**: 无需
+*   **请求格式**: `multipart/form-data`
+*   **请求参数**:
+    *   `file` (File, 必填): 要上传的文件，通常为图片文件。
+*   **成功响应 (200 OK)**:
+    ```json
+    {
+      "code": 1,
+      "msg": "success",
+      "data": "https://your-bucket.oss-cn-region.aliyuncs.com/path/to/uploaded-file.jpg"
+    }
+    ```
+*   **失败响应**:
+    *   `400 Bad Request`: 未选择文件或文件为空。
+    *   `500 Internal Server Error`: 文件上传失败。
+*   **使用场景**: 
+    *   用户发布书籍时上传封面图片
+    *   上传成功后返回的URL可用于填充发布表单的 `coverImageUrl` 字段
+
+---
+
+### **模块六：AI智能客服模块 (AI Assistant Module)**
+
+#### **6.1 智能客服对话**
+*   **功能**: AI智能客服对话接口，支持以下功能：
+    *   **智能问答**: 回答关于平台使用、规则等常见问题
+    *   **智能搜索**: 根据用户描述的需求，智能推荐相关书籍
+    *   **导航引导**: 引导用户前往相应功能页面
+*   **Endpoint**: `POST /ai/chat`
+*   **认证**: 无需
+*   **请求体 (Request Body)**:
+    ```json
+    {
+      "message": "我想找一本数据库相关的书" // String, 必填, 用户消息
+    }
+    ```
+*   **成功响应 (200 OK)**:
+    ```json
+    {
+      "code": 1,
+      "msg": "success",
+      "data": {
+        "reply": "我为您找到了以下数据库相关的书籍，请查看搜索结果。",
+        "action": {
+          "type": "search",  // 动作类型: search/navigate/none
+          "params": {
+            "keyword": "数据库"
+          }
+        },
+        "searchResults": [
+          {
+            "listingId": 1,
+            "title": "数据库系统概念",
+            "author": "Abraham Silberschatz",
+            "price": 35.50
+          }
+        ]
+      }
+    }
+    ```
+*   **响应字段说明**:
+    *   `reply` (String): AI的回复文本
+    *   `action` (Object, 可选): 建议的前端动作
+        *   `type`: 动作类型
+            *   `search`: 执行搜索
+            *   `navigate`: 页面导航
+            *   `none`: 纯文本回复，无需动作
+        *   `params`: 动作参数（如搜索关键词、导航目标页面等）
+    *   `searchResults` (Array, 可选): 当执行搜索时返回的书籍列表
+*   **失败响应**:
+    *   `400 Bad Request`: 消息为空。
+    *   `500 Internal Server Error`: AI服务暂时不可用。
+*   **使用示例**:
+    *   "怎么发布一本书？" → 返回发布指南并导航到发布页面
+    *   "我想买本高数书" → 执行搜索并返回相关书籍
+    *   "如何联系卖家？" → 返回联系卖家的操作说明
+

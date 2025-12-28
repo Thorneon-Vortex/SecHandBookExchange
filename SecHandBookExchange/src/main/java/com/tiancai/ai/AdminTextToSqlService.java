@@ -175,17 +175,17 @@ public class AdminTextToSqlService {
      */
     private String generateFriendlyAnswer(String userQuery, List<Map<String, Object>> results) {
         if (results.isEmpty()) {
-            return "查询完成，但没有找到相关数据 📭";
+            return "查询完成，但没有找到相关数据 ";
         }
         
         // 如果只有一行一列（如COUNT查询）
         if (results.size() == 1 && results.get(0).size() == 1) {
             Object value = results.get(0).values().iterator().next();
-            return String.format("查询结果：%s 📊", value);
+            return String.format("查询结果：%s ", value);
         }
         
         // 多行结果
-        return String.format("查询完成，共找到 %d 条结果 📊", results.size());
+        return String.format("查询完成，共找到 %d 条结果 ", results.size());
     }
 
     /**
